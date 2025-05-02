@@ -1,29 +1,43 @@
-import React, { useState } from 'react';
-import axios from '../api/axiosInstance';
-import { Link } from 'react-router-dom';
-import { Mail, Lock, LogIn } from 'lucide-react';
+import React, { useContext, useState } from "react";
+import axios from "../api/axiosInstance";
+import { Link, useNavigate } from "react-router-dom";
+import { Mail, Lock, LogIn } from "lucide-react";
+import { AuthContext } from "../context/AuthContext";
 
 function Login() {
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const navigate = useNavigate();
+  const { updateUser } = useContext(AuthContext);
+
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
-    setError('');
+    setError("");
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const response = await axios.post('https://localhost:7086/api/User/login', formData);
-      console.log('Login successful:', response.data);
-      // Redirect or store token as needed
+      const response = await axios.post(
+        "https://localhost:7086/api/User/login",
+        formData
+      );
+      console.log("Login successful:", response.data);
+
+      if (response.data.token?.roles.includes("User")) {
+        updateUser(response.data?.user);
+        localStorage.setItem("token", response.data.token);
+        navigate("/");
+      }
     } catch (error) {
-      setError(error.response?.data?.message || 'Login failed. Please try again.');
+      setError(
+        error.response?.data?.message || "Login failed. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -50,7 +64,10 @@ function Login() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Email address
               </label>
               <div className="relative">
@@ -72,7 +89,10 @@ function Login() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Password
               </label>
               <div className="relative">
@@ -123,15 +143,18 @@ function Login() {
               <span className="absolute left-0 inset-y-0 flex items-center pl-3">
                 <LogIn className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400" />
               </span>
-              {isLoading ? 'Signing in...' : 'Sign in'}
+              {isLoading ? "Signing in..." : "Sign in"}
             </button>
           </div>
         </form>
 
         <div className="text-center">
           <p className="text-sm text-gray-600">
-            Don't have an account?{' '}
-            <Link to="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
+            Don't have an account?{" "}
+            <Link
+              to="/register"
+              className="font-medium text-indigo-600 hover:text-indigo-500"
+            >
               Register here
             </Link>
           </p>
