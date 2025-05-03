@@ -8,6 +8,11 @@ import { Whitelist } from "./pages/Whitelist";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import MainLayout from "./components/MainLayout";
+import { AdminDashboard } from "./pages/Admin/AdminPanel";
+import { BooksPage } from "./pages/Admin/BooksManagement";
+import { UsersPage } from "./pages/Admin/UserManagement";
+import { StaffManagement } from "./pages/Admin/StaffManagement";
+import { AddBookForm } from "./pages/Admin/AddBooks";
 // import CataloguePage from "./pages/CataloguePage"; // Create this page too
 
 function App() {
@@ -21,6 +26,13 @@ function App() {
         <Routes>
           <Route element={<MainLayout />}>
             <Route path="/" element={<HomePage />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/books" element={<BooksPage />} />
+            <Route path="/admin/users" element={<UsersPage />} />
+            <Route path="/admin/staff" element={<StaffManagement />} />
+            <Route path="/admin/add-book" element={<AddBookForm />} />
+
+
             <Route path="/cart" element={<CartPage />} />
             <Route path="/whitelist" element={<Whitelist />} />
             {/* <Route path="/catalogue" element={<CataloguePage />} /> */}
