@@ -29,7 +29,7 @@ function Login() {
       );
       console.log("Login successful:", response.data);
 
-      if (response.data.token?.roles.includes("User")) {
+      if (response.data.user?.roles.includes("User")) {
         updateUser(response.data?.user);
         localStorage.setItem("token", response.data.token);
         navigate("/");
