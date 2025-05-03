@@ -1,10 +1,12 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 const BookDetails = () => {
+    const { bookId } = useParams();
+    
     // Static book data from backend (for now)
     const bookData = {
-        bookId: 2,
+        bookId: parseInt(bookId),
         title: "Hari Potter",
         author: "JK",
         genre: "magic",
