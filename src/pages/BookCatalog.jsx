@@ -1,5 +1,5 @@
 import React from "react";
-import intelligentInvestor from "../assets/intinvestor.png";
+import HP from "../assets/hp.png";
 import wimpyKid from "../assets/wimpykid.png";
 import predictiveAstrology from "../assets/PredictiveAstrology.png";
 import becomingSupernatural from "../assets/becomingsupernatural.png";
@@ -8,30 +8,62 @@ const BookCatalog = () => {
   const books = [
     {
       id: 1,
-      title: "The Intelligent Investor",
-      author: "Benjamin Graham",
-      price: "Rs. 550",
-      image: intelligentInvestor
+      title: "Harry Potter",
+      author: "JK",
+      genre: "Magic",
+      language: "English",
+      publisher: "ram",
+      format: "Hardcover",
+      isbn: "978-0060555665",
+      stockQuantity: 10,
+      price: 550,
+      isAvailable: true,
+      discounts: null,
+      image: HP
     },
     {
       id: 2,
       title: "Diary of a Wimpy Kid",
       author: "Jeff Kinney",
-      price: "Rs. 550",
+      genre: "Children's Fiction",
+      language: "English",
+      publisher: "Amulet Books",
+      format: "Paperback",
+      isbn: "978-0810993136",
+      stockQuantity: 15,
+      price: 550,
+      isAvailable: true,
+      discounts: null,
       image: wimpyKid
     },
     {
       id: 3,
       title: "Predictive Astrology",
       author: "Dinesh S Mathur",
-      price: "Rs. 550",
+      genre: "Astrology",
+      language: "English",
+      publisher: "Sagar Publications",
+      format: "Paperback",
+      isbn: "978-8170820660",
+      stockQuantity: 8,
+      price: 550,
+      isAvailable: true,
+      discounts: null,
       image: predictiveAstrology
     },
     {
       id: 4,
       title: "Becoming Supernatural",
       author: "Dr. Joe Dispenza",
-      price: "Rs. 550",
+      genre: "Self-Help",
+      language: "English",
+      publisher: "Hay House",
+      format: "Hardcover",
+      isbn: "978-1401953113",
+      stockQuantity: 12,
+      price: 550,
+      isAvailable: true,
+      discounts: null,
       image: becomingSupernatural
     }
   ];
@@ -90,10 +122,21 @@ const BookCatalog = () => {
                   />
                 </div>
                 <h3 className="font-semibold text-lg mb-1">{book.title}</h3>
-                <p className="text-sm text-gray-600 mb-2">by {book.author}</p>
-                <p className="font-bold mb-3 text-blue-600">{book.price}</p>
-                <button className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
-                  ADD TO CART
+                <p className="text-sm text-gray-600 mb-1">by {book.author}</p>
+                <p className="text-xs text-gray-500 mb-1">Genre: {book.genre}</p>
+                <p className="text-xs text-gray-500 mb-1">Format: {book.format}</p>
+                <p className="text-xs text-gray-500 mb-1">ISBN: {book.isbn}</p>
+                <p className="text-xs text-gray-500 mb-2">Stock: {book.stockQuantity}</p>
+                <p className="font-bold mb-3 text-blue-600">Rs. {book.price}</p>
+                <button 
+                  className={`w-full py-2 rounded transition ${
+                    book.isAvailable 
+                      ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                      : 'bg-gray-400 text-white cursor-not-allowed'
+                  }`}
+                  disabled={!book.isAvailable}
+                >
+                  {book.isAvailable ? 'ADD TO CART' : 'OUT OF STOCK'}
                 </button>
               </div>
             ))}
@@ -114,10 +157,21 @@ const BookCatalog = () => {
                   />
                 </div>
                 <h3 className="font-semibold text-lg mb-1">{book.title}</h3>
-                <p className="text-sm text-gray-600 mb-2">by {book.author}</p>
-                <p className="font-bold mb-3 text-blue-600">{book.price}</p>
-                <button className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
-                  ADD TO CART
+                <p className="text-sm text-gray-600 mb-1">by {book.author}</p>
+                <p className="text-xs text-gray-500 mb-1">Genre: {book.genre}</p>
+                <p className="text-xs text-gray-500 mb-1">Format: {book.format}</p>
+                <p className="text-xs text-gray-500 mb-1">ISBN: {book.isbn}</p>
+                <p className="text-xs text-gray-500 mb-2">Stock: {book.stockQuantity}</p>
+                <p className="font-bold mb-3 text-blue-600">Rs. {book.price}</p>
+                <button 
+                  className={`w-full py-2 rounded transition ${
+                    book.isAvailable 
+                      ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                      : 'bg-gray-400 text-white cursor-not-allowed'
+                  }`}
+                  disabled={!book.isAvailable}
+                >
+                  {book.isAvailable ? 'ADD TO CART' : 'OUT OF STOCK'}
                 </button>
               </div>
             ))}
@@ -138,10 +192,21 @@ const BookCatalog = () => {
                   />
                 </div>
                 <h3 className="font-semibold text-lg mb-1">{book.title}</h3>
-                <p className="text-sm text-gray-600 mb-2">by {book.author}</p>
-                <p className="font-bold mb-3 text-blue-600">{book.price}</p>
-                <button className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
-                  ADD TO CART
+                <p className="text-sm text-gray-600 mb-1">by {book.author}</p>
+                <p className="text-xs text-gray-500 mb-1">Genre: {book.genre}</p>
+                <p className="text-xs text-gray-500 mb-1">Format: {book.format}</p>
+                <p className="text-xs text-gray-500 mb-1">ISBN: {book.isbn}</p>
+                <p className="text-xs text-gray-500 mb-2">Stock: {book.stockQuantity}</p>
+                <p className="font-bold mb-3 text-blue-600">Rs. {book.price}</p>
+                <button 
+                  className={`w-full py-2 rounded transition ${
+                    book.isAvailable 
+                      ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                      : 'bg-gray-400 text-white cursor-not-allowed'
+                  }`}
+                  disabled={!book.isAvailable}
+                >
+                  {book.isAvailable ? 'ADD TO CART' : 'OUT OF STOCK'}
                 </button>
               </div>
             ))}
