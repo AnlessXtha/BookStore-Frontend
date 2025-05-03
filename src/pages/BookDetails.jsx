@@ -2,6 +2,30 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 const BookDetails = () => {
+    // Static book data from backend (for now)
+    const bookData = {
+        bookId: 2,
+        title: "Hari Potter",
+        author: "JK",
+        genre: "magic",
+        language: "eng",
+        publisher: "ram",
+        format: "khai",
+        isbn: "1234323",
+        stockQuantity: 5,
+        price: 800,
+        isAvailable: true,
+        discounts: null,
+        // Added image placeholder
+        coverImage: "src/assets/hp.png",
+        // Added some additional details for UI display
+        ratings: {
+            average: 4.2,
+            count: 322
+        },
+        description: "A magical journey of a young wizard discovering his powers and fighting against dark forces. This book follows Hari Potter as he navigates through the world of wizardry, making friends and encountering enemies along the way. Perfect for readers of all ages who enjoy fantasy literature with elements of adventure, friendship, and courage."
+    };
+
     const [isWishlisted, setIsWishlisted] = useState(false);
     const [isAddedToCart, setIsAddedToCart] = useState(false);
 
@@ -11,6 +35,33 @@ const BookDetails = () => {
 
     const handleAddToCart = () => {
         setIsAddedToCart(true);
+    };
+
+    // Function to render star ratings
+    const renderStars = (rating) => {
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating - fullStars >= 0.5;
+        const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+        return (
+            <div className="flex">
+                {[...Array(fullStars)].map((_, index) => (
+                    <svg key={`full-${index}`} className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                ))}
+                {hasHalfStar && (
+                    <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                )}
+                {[...Array(emptyStars)].map((_, index) => (
+                    <svg key={`empty-${index}`} className="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                ))}
+            </div>
+        );
     };
 
     return (
@@ -62,49 +113,42 @@ const BookDetails = () => {
                     {/* Book Cover Image */}
                     <div className="md:w-1/3">
                         <img
-                            src="src/assets/murderbook.jpg"
-                            alt="The Fact of a Body book cover"
+                            src={bookData.coverImage}
+                            alt={`${bookData.title} book cover`}
                             className="w-full shadow-lg"
                         />
                     </div>
 
                     {/* Book Details */}
                     <div className="md:w-2/3 bg-white p-8 shadow">
-                    <h1 className="text-5xl font-bold mb-2">The Fact of a Body</h1>
-                        <p className="text-2xl mb-4">by Alexandria Marzano-Lesnevich</p>
-                        <p className="text-xl font-semibold mb-2">Rs. 2999</p>
+                        <h1 className="text-5xl font-bold mb-2">{bookData.title}</h1>
+                        <p className="text-2xl mb-4">by {bookData.author}</p>
+                        <p className="text-xl font-semibold mb-2">Rs. {bookData.price}</p>
 
                         <div className="flex items-center mb-4">
-                            <div className="flex">
-                                {[1, 2, 3, 4].map((star) => (
-                                    <svg key={star} className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                    </svg>
-                                ))}
-                                <svg className="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
+                            {renderStars(bookData.ratings.average)}
+                            <span className="ml-2 text-gray-600">
+                                {bookData.ratings.average}/5 ({bookData.ratings.count} ratings)
+                            </span>
+                        </div>
+
+                        {/* Additional book details */}
+                        <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
+                            <div>
+                                <p><span className="font-semibold">Genre:</span> {bookData.genre}</p>
+                                <p><span className="font-semibold">Language:</span> {bookData.language}</p>
+                                <p><span className="font-semibold">Publisher:</span> {bookData.publisher}</p>
                             </div>
-                            <span className="ml-2 text-gray-600">4/5 (467 ratings)</span>
+                            <div>
+                                <p><span className="font-semibold">Format:</span> {bookData.format}</p>
+                                <p><span className="font-semibold">ISBN:</span> {bookData.isbn}</p>
+                                <p><span className="font-semibold">Stock:</span> {bookData.stockQuantity} {bookData.stockQuantity > 1 ? 'copies' : 'copy'} available</p>
+                            </div>
                         </div>
 
                         <div className="mb-8">
                             <p className="text-gray-700 mb-4">
-                                Es un hecho establecido hace demasiado tiempo que un lector se
-                                distraerá con el contenido del texto de un sitio mientras que
-                                mira su diseño. El punto de usar Lorem Ipsum es que tiene una
-                                distribución más o menos normal de las letras, al contrario de
-                                usar textos como por ejemplo "Contenido aquí, contenido aquí".
-                                Estos textos hacen parecerlo un español que se puede leer.
-                            </p>
-                            <p className="text-gray-700 mb-4">
-                                Muchos paquetes de autoedición y editores de páginas web usan
-                                el Lorem Ipsum como su texto por defecto, y al hacer una
-                                búsqueda de "Lorem Ipsum" va a dar por resultado muchos sitios
-                                web que usan este texto si se encuentran en estado de desarrollo.
-                                Muchas versiones han evolucionado a través de los años, algunas
-                                veces por accidente, otras veces a propósito (por ejemplo
-                                insertándole humor y cosas por el estilo).
+                                {bookData.description}
                             </p>
                         </div>
 
@@ -114,16 +158,22 @@ const BookDetails = () => {
                                 className={`px-6 py-2 border-2 border-black font-medium ${
                                     isWishlisted ? "bg-gray-200" : "bg-white"
                                 }`}
+                                disabled={!bookData.isAvailable}
                             >
                                 {isWishlisted ? "Added to Wishlist" : "Add to Wishlist"}
                             </button>
                             <button
                                 onClick={handleAddToCart}
                                 className={`px-6 py-2 bg-black text-white font-medium ${
-                                    isAddedToCart ? "opacity-75" : ""
+                                    isAddedToCart || !bookData.isAvailable ? "opacity-75" : ""
                                 }`}
+                                disabled={!bookData.isAvailable || isAddedToCart}
                             >
-                                {isAddedToCart ? "Added to Cart" : "Add to Cart"}
+                                {!bookData.isAvailable
+                                    ? "Out of Stock"
+                                    : isAddedToCart
+                                        ? "Added to Cart"
+                                        : "Add to Cart"}
                             </button>
                         </div>
                     </div>
