@@ -17,6 +17,30 @@ function Login() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const fetchCartItems = async (query = "", page = 1) => {
+    setIsLoading(true);
+    try {
+      const endpoint = 'api/Cart/my-cart';
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("No token found. Please log in again.");
+        return;
+      }
+
+      const response = await apiClient.get(endpoint, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      });
+      setCart(response.data.items || response.data);
+      updateCart(response.data.items || response.data);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to fetch books.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -29,11 +53,14 @@ function Login() {
       );
       console.log("Login successful:", response.data);
 
-      if (response.data.token?.roles.includes("User")) {
+      if (response.data.user?.roles.includes("User")) {
         updateUser(response.data?.user);
-        localStorage.setItem("token", response.data.token);
+        await localStorage.setItem("token", response.data.token);
+        await fetchCartItems();
+  
         navigate("/");
       }
+
     } catch (error) {
       setError(
         error.response?.data?.message || "Login failed. Please try again."

@@ -1,34 +1,43 @@
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Trash2, ShoppingBag } from 'lucide-react';
+import { Trash2, ShoppingBag, ShoppingCart, User } from 'lucide-react';
+import { createApiClient } from '../lib/createApiClient';
+import { AuthContext } from '../context/AuthContext';
 
 export function CartPage() {
-    const [cart, setCart] = useState([
-        {
-            bookId: 1,
-            title: "Atomic Habits",
-            author: "James Clear",
-            price: 800,
-            quantity: 2,
-            coverImage: "https://m.media-amazon.com/images/I/91bYsX41DVL._SL1500_.jpg"
-        },
-        {
-            bookId: 2,
-            title: "The Alchemist",
-            author: "Paulo Coelho",
-            price: 500,
-            quantity: 1,
-            coverImage: "https://m.media-amazon.com/images/I/51Z0nLAfLmL.jpg"
-        },
-        {
-            bookId: 3,
-            title: "Deep Work",
-            author: "Cal Newport",
-            price: 950,
-            quantity: 1,
-            coverImage: "https://m.media-amazon.com/images/I/61qWD9YIefL.jpg"
+    const { currentUser } = useContext(AuthContext);
+
+    const token = localStorage.getItem("token");
+
+    const [cart, setCart] = useState([]);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const apiClient = createApiClient("https://localhost:7086");
+
+    const fetchCartItems = async (query = "", page = 1) => {
+        setIsLoading(true);
+        try {
+            const endpoint = 'api/Cart/my-cart';
+
+            const response = await apiClient.get(endpoint, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+            });
+            setCart(response.data.items || response.data);
+        } catch (err) {
+            setError(err.response?.data?.message || "Failed to fetch books.");
+        } finally {
+            setIsLoading(false);
         }
-    ]);
+    };
+
+
+    useEffect(() => {
+        fetchCartItems(searchQuery);
+    }, [searchQuery]);
+
 
     const updateQuantity = (bookId, newQuantity) => {
         if (newQuantity < 1) return;
@@ -37,9 +46,23 @@ export function CartPage() {
         ));
     };
 
-    const removeItem = (bookId) => {
-        setCart(cart.filter(item => item.bookId !== bookId));
+    const removeItem = async (bookId) => {
+        try {
+            const endpoint = `api/Cart/remove/${bookId}`;
+
+            const response = await apiClient.delete(endpoint, {
+                headers: {
+                    Authorization: `Bearer ${token}`, // make sure token is coming from currentUser
+                }
+            });
+
+            // Optimistically update UI after success
+            setCart(cart.filter(item => item.bookId !== bookId));
+        } catch (error) {
+            console.error("Failed to remove item:", error);
+        }
     };
+
 
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const discount = cart.length >= 5 ? subtotal * 0.05 : 0;
@@ -63,6 +86,81 @@ export function CartPage() {
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <header className="bg-white shadow">
+                <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+                    <h1 className="text-2xl font-bold text-blue-700">CoverToCover</h1>
+                    <nav className="flex items-center space-x-6">
+                        {/* Cart Icon with Badge */}
+                        <Link
+                            to="/cart"
+                            className="relative text-gray-500 hover:text-gray-700"
+                        >
+                            <ShoppingCart className="h-6 w-6" />
+                            <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-indigo-600 rounded-full">
+                                {cart.length}
+                            </span>
+                        </Link>
+
+                        {/* Home Link */}
+                        <Link
+                            to="/"
+                            className="text-gray-600 hover:text-blue-600 active:text-blue-700"
+                        >
+                            Home
+                        </Link>
+
+                        {/* Catalogue Link */}
+                        <Link
+                            to="/catalogue"
+                            className="text-gray-600 hover:text-blue-600 active:text-blue-700"
+                        >
+                            Catalogue
+                        </Link>
+
+                        {/* About Link */}
+                        <Link
+                            to="/about"
+                            className="text-gray-600 hover:text-blue-600 active:text-blue-700"
+                        >
+                            About
+                        </Link>
+
+                        {/* Contact Link */}
+                        <Link
+                            to="/contact"
+                            className="text-gray-600 hover:text-blue-600 active:text-blue-700"
+                        >
+                            Contact
+                        </Link>
+
+                        {currentUser ? (
+                            <Link
+                                to="/"
+                                className="text-gray-600 hover:text-blue-600 active:text-blue-700 flex items-center gap-2"
+                            >
+                                <User className="h-6 w-6" />
+                                {currentUser?.firstName} {currentUser?.lastName}
+                            </Link>
+                        ) : (
+                            <>
+                                <Link
+                                    to="/login"
+                                    className="text-gray-600 hover:text-blue-600 active:text-blue-700"
+                                >
+                                    Login
+                                </Link>
+
+                                <Link
+                                    to="/register"
+                                    className="text-gray-600 hover:text-blue-600 active:text-blue-700"
+                                >
+                                    Register
+                                </Link>
+                            </>
+                        )}
+                    </nav>
+                </div>
+            </header>
             <h1 className="text-3xl font-lexend text-lg-bold text-gray-900">Shopping Cart</h1>
 
             <div className="mt-12 lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start">

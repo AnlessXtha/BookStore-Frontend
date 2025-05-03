@@ -1,24 +1,37 @@
-import React, { useState, useEffect } from 'react';
-import { Bookmark, Trash2, Clock, AlertCircle, Check, X, Filter, SortDesc, BookOpen } from 'lucide-react';
+import React, { useState, useEffect, useContext } from 'react';
+import { Bookmark, Trash2, Clock, AlertCircle, Check, X, Filter, SortDesc, BookOpen, ShoppingCart, User } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
+import { createApiClient } from '../lib/createApiClient';
+import { Link } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 
 export function Whitelist() {
+    const { currentUser } = useContext(AuthContext);
+
+    const token = localStorage.getItem("token");
+
     const [whitelistedBooks, setWhitelistedBooks] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [sortBy, setSortBy] = useState('dateAdded');
     const [filterAvailable, setFilterAvailable] = useState('all');
     const [showFilters, setShowFilters] = useState(false);
+    const apiClient = createApiClient("https://localhost:7086");
+
 
     // Mock data - replace with actual API calls
     useEffect(() => {
         const fetchWhitelist = async () => {
             try {
-                const response = await axios.get('https://localhost:7086/api/Whitelist/my-whitelist', {
-                    withCredentials: true // Include if your API uses cookies or auth
+                const endpoint = 'api/Whitelist/my-whitelist';
+
+                const response = await apiClient.get(endpoint, {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // make sure token is coming from currentUser
+                    }
                 });
-                
+
                 setWhitelistedBooks(response.data);
             } catch (error) {
                 console.error('Error fetching whitelist:', error);
@@ -27,14 +40,20 @@ export function Whitelist() {
                 setIsLoading(false);
             }
         };
-    
         fetchWhitelist();
     }, []);
-    
+
 
     const handleRemoveFromWhitelist = async (bookId) => {
         try {
-            // Replace with actual API call
+            const endpoint = `api/Whitelist/remove/${bookId}`;
+
+            const response = await apiClient.delete(endpoint, {
+                headers: {
+                    Authorization: `Bearer ${token}`, // make sure token is coming from currentUser
+                }
+            });
+
             setWhitelistedBooks(whitelistedBooks.filter(book => book.bookId !== bookId));
             toast.success('Book removed from bookmarks');
         } catch (error) {
@@ -72,6 +91,81 @@ export function Whitelist() {
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <header className="bg-white shadow">
+                <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+                    <h1 className="text-2xl font-bold text-blue-700">CoverToCover</h1>
+                    <nav className="flex items-center space-x-6">
+                        {/* Cart Icon with Badge */}
+                        <Link
+                            to="/cart"
+                            className="relative text-gray-500 hover:text-gray-700"
+                        >
+                            <ShoppingCart className="h-6 w-6" />
+                            <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-indigo-600 rounded-full">
+                                0
+                            </span>
+                        </Link>
+
+                        {/* Home Link */}
+                        <Link
+                            to="/"
+                            className="text-gray-600 hover:text-blue-600 active:text-blue-700"
+                        >
+                            Home
+                        </Link>
+
+                        {/* Catalogue Link */}
+                        <Link
+                            to="/catalogue"
+                            className="text-gray-600 hover:text-blue-600 active:text-blue-700"
+                        >
+                            Catalogue
+                        </Link>
+
+                        {/* About Link */}
+                        <Link
+                            to="/about"
+                            className="text-gray-600 hover:text-blue-600 active:text-blue-700"
+                        >
+                            About
+                        </Link>
+
+                        {/* Contact Link */}
+                        <Link
+                            to="/contact"
+                            className="text-gray-600 hover:text-blue-600 active:text-blue-700"
+                        >
+                            Contact
+                        </Link>
+
+                        {currentUser ? (
+                            <Link
+                                to="/"
+                                className="text-gray-600 hover:text-blue-600 active:text-blue-700 flex items-center gap-2"
+                            >
+                                <User className="h-6 w-6" />
+                                {currentUser?.firstName} {currentUser?.lastName}
+                            </Link>
+                        ) : (
+                            <>
+                                <Link
+                                    to="/login"
+                                    className="text-gray-600 hover:text-blue-600 active:text-blue-700"
+                                >
+                                    Login
+                                </Link>
+
+                                <Link
+                                    to="/register"
+                                    className="text-gray-600 hover:text-blue-600 active:text-blue-700"
+                                >
+                                    Register
+                                </Link>
+                            </>
+                        )}
+                    </nav>
+                </div>
+            </header>
             <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
                 <div className="flex items-center gap-3">
                     <Bookmark className="h-7 w-7 text-indigo-600" />
@@ -130,7 +224,7 @@ export function Whitelist() {
                 </div>
             ) : displayBooks.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {displayBooks.map((book) => (
+                    {displayBooks?.map((book) => (
                         <div
                             key={book.bookId}
                             className="bg-white rounded-2xl shadow hover:shadow-lg transition-shadow border border-gray-200 overflow-hidden"
@@ -156,7 +250,7 @@ export function Whitelist() {
                                 <p className="text-sm text-gray-600 mb-2 truncate">{book.author}</p>
 
                                 <div className="flex items-center justify-between mb-3">
-                                    <span className="text-base font-semibold text-gray-900">${book.price.toFixed(2)}</span>
+                                    <span className="text-base font-semibold text-gray-900">Rs {book?.price?.toFixed(2)}</span>
                                     <span className={`flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${book.isAvailable ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                                         }`}>
                                         {book.isAvailable ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
