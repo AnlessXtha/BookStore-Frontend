@@ -236,7 +236,7 @@ const BookCatalog = () => {
                 >
                   <div className="aspect-[3/4] w-full mb-4 overflow-hidden rounded">
                     <img
-                      src={book.image || HP}
+                      src={`https://localhost:7086${book.imagePath} `}
                       alt={book.title}
                       className="w-full h-full object-contain"
                     />
