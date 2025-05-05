@@ -12,7 +12,11 @@ import { AdminDashboard } from "./pages/Admin/AdminPanel";
 import { BooksPage } from "./pages/Admin/BooksManagement";
 import { UsersPage } from "./pages/Admin/UserManagement";
 import { StaffManagement } from "./pages/Admin/StaffManagement";
-import { AddBookForm } from "./pages/Admin/AddBooks";
+import { AddBookForm } from "./pages/Admin/AddBookForm";
+import BookCatalog from "./pages/BookCatalog";
+import OrdersPage from "./pages/MyOrders";
+import OrderDetails from "./pages/OrderDetails";
+import BookDetails from "./pages/BookDetails";
 // import CataloguePage from "./pages/CataloguePage"; // Create this page too
 
 function App() {
@@ -35,8 +39,11 @@ function App() {
 
             <Route path="/cart" element={<CartPage />} />
             <Route path="/whitelist" element={<Whitelist />} />
-            {/* <Route path="/catalogue" element={<CataloguePage />} /> */}
-            {/* <Route path="/contact" element={<ContactPage />} /> */}
+            <Route path="/catalog" element={<BookCatalog />} />
+            <Route path="/bookdetails/:id" element={<BookDetails />} />
+            <Route path="/addBook" element={<AddBookForm />} />
+            <Route path="/myorders" element={<OrdersPage />} />
+            <Route path="/orderdetails/:id" element={<OrderDetails />} />
           </Route>
 
           {/* Routes without Navbar */}

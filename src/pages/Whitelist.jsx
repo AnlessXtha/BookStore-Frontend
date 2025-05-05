@@ -20,7 +20,6 @@ export function Whitelist() {
     const apiClient = createApiClient("https://localhost:7086");
 
 
-    // Mock data - replace with actual API calls
     useEffect(() => {
         const fetchWhitelist = async () => {
             try {
@@ -28,7 +27,7 @@ export function Whitelist() {
 
                 const response = await apiClient.get(endpoint, {
                     headers: {
-                        Authorization: `Bearer ${token}`, // make sure token is coming from currentUser
+                        Authorization: `Bearer ${token}`, 
                     }
                 });
 

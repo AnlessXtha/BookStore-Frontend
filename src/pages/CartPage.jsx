@@ -25,7 +25,8 @@ export function CartPage() {
                     Authorization: `Bearer ${token}`,
                 }
             });
-            setCart(response.data.items || response.data);
+            setCart(response.data.data || response.data);
+            console.log(cart)
         } catch (err) {
             setError(err.response?.data?.message || "Failed to fetch books.");
         } finally {
@@ -39,12 +40,25 @@ export function CartPage() {
     }, [searchQuery]);
 
 
-    const updateQuantity = (bookId, newQuantity) => {
-        if (newQuantity < 1) return;
-        setCart(cart.map(item =>
-            item.bookId === bookId ? { ...item, quantity: newQuantity } : item
-        ));
-    };
+    const updateQuantity = async (bookId, newQuantity) => {
+        try {
+            console.log(bookId, newQuantity)
+            const endpoint = `api/Cart/addQuantity?bookId=${bookId}&quantity=${newQuantity}`;
+
+            const response = await apiClient.post(endpoint, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+            });
+
+            if (newQuantity < 1) return;
+            setCart(cart.map(item =>
+                item.bookId === bookId ? { ...item, quantity: newQuantity } : item
+            ));
+        } catch (error) {
+            console.error("Failed to update quantity:", error);
+        }
+    }
 
     const removeItem = async (bookId) => {
         try {
@@ -52,7 +66,7 @@ export function CartPage() {
 
             const response = await apiClient.delete(endpoint, {
                 headers: {
-                    Authorization: `Bearer ${token}`, // make sure token is coming from currentUser
+                    Authorization: `Bearer ${token}`,
                 }
             });
 
@@ -63,8 +77,9 @@ export function CartPage() {
         }
     };
 
-
-    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const subtotal = Array.isArray(cart)
+        ? cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+        : 0;
     const discount = cart.length >= 5 ? subtotal * 0.05 : 0;
     const total = subtotal - discount;
 
@@ -166,7 +181,7 @@ export function CartPage() {
             <div className="mt-12 lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start">
                 <div className="lg:col-span-7">
                     <ul className="border-t border-b border-gray-200 divide-y divide-gray-200">
-                        {cart.map((item) => (
+                        {cart?.map((item) => (
                             <li key={item.bookId} className="flex py-6 sm:py-10">
                                 <div className="flex-shrink-0">
                                     <img

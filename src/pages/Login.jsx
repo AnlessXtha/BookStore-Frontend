@@ -53,7 +53,7 @@ function Login() {
       );
       console.log("Login successful:", response.data);
 
-      if (response.data.user?.roles.includes("User")) {
+      if (response.data.user?.roles.includes("Member")) {
         updateUser(response.data?.user);
         await localStorage.setItem("token", response.data.token);
         await fetchCartItems();
