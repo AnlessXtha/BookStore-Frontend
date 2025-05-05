@@ -45,7 +45,7 @@ export function CartPage() {
             console.log(bookId, newQuantity)
             const endpoint = `api/Cart/addQuantity?bookId=${bookId}&quantity=${newQuantity}`;
 
-            const response = await apiClient.post(endpoint, {
+            const response = await apiClient.post(endpoint, null, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 }
