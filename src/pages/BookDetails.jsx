@@ -5,6 +5,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { AuthContext } from "../context/AuthContext";
 import { createApiClient } from "../lib/createApiClient";
+import axios from "axios";
 
 const BookDetails = () => {
   const { id } = useParams();
@@ -126,6 +127,26 @@ const BookDetails = () => {
     );
   };
 
+  const submitRating = async (bookId, stars, review) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.post("/api/rate", {
+        bookId,
+        stars,
+        review
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      alert(response.data.data); // "Rating submitted successfully!"
+    } catch (err) {
+      alert(err.response.data.message); // "You can only rate books you've purchased."
+    }
+  };
+
+
   if (loading) return <div className="text-center py-10">Loading...</div>;
   if (error)
     return <div className="text-center text-red-500 py-10">{error}</div>;
@@ -136,7 +157,7 @@ const BookDetails = () => {
         <div className="flex flex-col md:flex-row gap-8">
           <div className="md:w-1/3">
             <img
-              src={bookData.coverImage || HP || "/fallback.jpg"}
+              src={bookData.coverImage || "/fallback.jpg"}
               alt={`${bookData.title} book cover`}
               className="w-full shadow-lg"
             />
@@ -196,25 +217,23 @@ const BookDetails = () => {
             <div className="flex space-x-4">
               <button
                 onClick={handleAddToWhitelist}
-                className={`px-6 py-2 border-2 border-black font-medium ${
-                  isWhitelisted ? "bg-gray-200" : "bg-white"
-                }`}
+                className={`px-6 py-2 border-2 border-black font-medium ${isWhitelisted ? "bg-gray-200" : "bg-white"
+                  }`}
                 disabled={!bookData.isAvailable}
               >
                 {isWhitelisted ? "Added to Whitelist" : "Add to Whitelist"}
               </button>
               <button
                 onClick={handleAddToCart}
-                className={`px-6 py-2 bg-black text-white font-medium ${
-                  isAddedToCart || !bookData.isAvailable ? "opacity-75" : ""
-                }`}
+                className={`px-6 py-2 bg-black text-white font-medium ${isAddedToCart || !bookData.isAvailable ? "opacity-75" : ""
+                  }`}
                 disabled={!bookData.isAvailable || isAddedToCart}
               >
                 {!bookData.isAvailable
                   ? "Out of Stock"
                   : isAddedToCart
-                  ? "Added to Cart"
-                  : "Add to Cart"}
+                    ? "Added to Cart"
+                    : "Add to Cart"}
               </button>
             </div>
           </div>

@@ -64,7 +64,12 @@ function Login() {
         await localStorage.setItem("token", response.data.token);
 
         navigate("/admin");
+      }
+      else{
+        updateUser(response.data?.user);
+        await localStorage.setItem("token", response.data.token);
 
+        navigate("/staff");
       }
 
     } catch (error) {

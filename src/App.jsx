@@ -15,8 +15,9 @@ import { StaffManagement } from "./pages/Admin/StaffManagement";
 import { AddBookForm } from "./pages/Admin/AddBookForm";
 import BookCatalog from "./pages/BookCatalog";
 import OrdersPage from "./pages/MyOrders";
-import OrderDetails from "./pages/OrderDetails";
 import BookDetails from "./pages/BookDetails";
+import StaffDashboard from "./pages/Staff/StaffDashboard";
+import OrderDetails from "./pages/Staff/UserOrderDetails";
 // import CataloguePage from "./pages/CataloguePage"; // Create this page too
 
 function App() {
@@ -46,9 +47,13 @@ function App() {
 
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/books" element={<BooksPage />} />
-          <Route path="/admin/users" element={<UsersPage />} />
+          <Route path="/users" element={<UsersPage />} />
           <Route path="/admin/staff" element={<StaffManagement />} />
           <Route path="/admin/add-book" element={<AddBookForm />} />
+
+          <Route path="/staff" element={<StaffDashboard />} />
+          <Route path="/staff/user-order-details" element={<OrderDetails />} />
+
         </Routes>
       </Router>
     </>

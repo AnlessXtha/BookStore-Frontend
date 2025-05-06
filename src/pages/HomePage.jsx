@@ -1,4 +1,4 @@
-import { ShoppingCart, User } from "lucide-react";
+import { Eye, ShoppingCart, User } from "lucide-react";
 import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
@@ -140,6 +140,14 @@ const HomePage = () => {
                     >
                       Add to Cart
                     </button>
+                    <Link
+
+                      to={`/bookdetails/${book.bookId}`}
+                      className="bg-gray-200 hover:bg-gray-300 text-sm px-3 py-1 rounded"
+                    >
+                      <Eye />
+                      </Link>
+
                     <button
                       onClick={() => handleAddToWhitelist(book)}
                       className="bg-gray-200 hover:bg-gray-300 text-sm px-3 py-1 rounded"
