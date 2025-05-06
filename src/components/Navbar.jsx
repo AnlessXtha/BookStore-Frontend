@@ -23,26 +23,26 @@ function Navbar() {
 
             {/* Catalogue Link */}
             <Link
-              to="/catalogue"
+              to="/catalog"
               className="text-gray-600 hover:text-blue-600 active:text-blue-700"
             >
-              Catalogue
+              Catalog
             </Link>
 
             {/* About Link */}
-            <Link
-              to="/about"
-              className="text-gray-600 hover:text-blue-600 active:text-blue-700"
-            >
-              About
-            </Link>
+            {/* <Link
+                            to="/about"
+                            className="text-gray-600 hover:text-blue-600 active:text-blue-700"
+                        >
+                            About
+                        </Link> */}
 
             {/* Contact Link */}
             <Link
-              to="/contact"
+              to="/myorders"
               className="text-gray-600 hover:text-blue-600 active:text-blue-700"
             >
-              Contact
+              Orders
             </Link>
             {/* Cart Icon with Badge */}
             <Link

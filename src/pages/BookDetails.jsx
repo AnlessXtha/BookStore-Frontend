@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { createApiClient } from "../lib/createApiClient";
 import HP from "../assets/hp.png";
+
+// import HP from "../assets/hp.png";
 
 import toast from "react-hot-toast";
 import { AuthContext } from "../context/AuthContext";
+import { createApiClient } from "../lib/createApiClient";
 
 const BookDetails = () => {
   const { id } = useParams();
