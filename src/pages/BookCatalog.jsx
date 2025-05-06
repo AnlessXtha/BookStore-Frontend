@@ -4,12 +4,6 @@ import HP from "../assets/hp.png";
 import wimpyKid from "../assets/wimpykid.png";
 import predictiveAstrology from "../assets/PredictiveAstrology.png";
 import becomingSupernatural from "../assets/becomingsupernatural.png";
-<<<<<<< HEAD
-
-const BookCatalog = () => {
-  const navigate = useNavigate();
-  const books = [
-=======
 import { createApiClient } from "../lib/createApiClient";
 import toast from "react-hot-toast";
 import { AuthContext } from "../context/AuthContext";
@@ -18,7 +12,6 @@ import { Search } from "lucide-react";
 const BookCatalog = () => {
   const navigate = useNavigate();
   const booksStatic = [
->>>>>>> c7ae66307202f5aa9e96afff3da811418ff07cf9
     {
       id: 1,
       title: "Harry Potter",
