@@ -1,37 +1,22 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Search, Plus, Filter } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext';
+import { createApiClient } from '../../lib/createApiClient';
 
 export function BooksPage() {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [activeFilter, setActiveFilter] = useState('all');
     const [showFilters, setShowFilters] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [books, setBooks] = useState([]);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
-    const books = [
-        {
-            id: 1,
-            title: "The Silent Patient",
-            author: "Alex Michaelides",
-            cover: "https://images.pexels.com/photos/1765033/pexels-photo-1765033.jpeg",
-            price: 24.99,
-            rating: 4.8,
-            stock: 15,
-            genre: ["Thriller", "Mystery"],
-            isNew: true
-        },
-        {
-            id: 2,
-            title: "Atomic Habits",
-            author: "James Clear",
-            cover: "https://images.pexels.com/photos/2099691/pexels-photo-2099691.jpeg",
-            price: 19.99,
-            rating: 4.9,
-            stock: 12,
-            genre: ["Self-help", "Psychology"],
-            isNew: false
-        }
-    ];
+    const { currentUser } = useContext(AuthContext);
+    const token = localStorage.getItem("token");
 
     const filters = [
         { id: 'all', name: 'All Books' },
@@ -46,6 +31,34 @@ export function BooksPage() {
         return matchesSearch;
     });
 
+    const pageSize = 8;
+    const apiClient = createApiClient("https://localhost:7086");
+
+    const fetchBooks = async (query = "", page = 1) => {
+        setIsLoading(true);
+        try {
+            const endpoint = query
+                ? `/api/Books/search?search=${encodeURIComponent(
+                    query
+                )}&pageNumber=${page}&pageSize=${pageSize}`
+                : `/api/Books?pageNumber=${page}&pageSize=${pageSize}`;
+
+            const response = await apiClient.get(endpoint);
+            setBooks(response.data.items || response.data);
+            setTotalPages(response.data.totalPages || 1);
+        } catch (err) {
+            setError(err.response?.data?.message || "Failed to fetch books.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+
+    useEffect(() => {
+        fetchBooks(searchQuery, currentPage);
+    }, [searchQuery, currentPage]);
+
+    console.log(books)
     const handleAddBook = () => {
         navigate('/admin/add-book')
     }
@@ -109,8 +122,8 @@ export function BooksPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredBooks.map(book => (
-                            <tr key={book.id} className="border-b hover:bg-gray-50">
+                        {filteredBooks?.map(book => (
+                            <tr key={book.bookId} className="border-b hover:bg-gray-50">
                                 <td className="p-3">
                                     <img src={book.cover} alt={book.title} className="w-16 h-20 object-cover rounded" />
                                 </td>
@@ -118,18 +131,14 @@ export function BooksPage() {
                                 <td className="p-3 text-gray-600">{book.author}</td>
                                 <td className="p-3">
                                     <div className="flex flex-wrap gap-1">
-                                        {book.genre.map(g => (
-                                            <span key={g} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                                                {g}
-                                            </span>
-                                        ))}
+                                        {book.genre}
                                     </div>
                                 </td>
                                 <td className="p-3 font-semibold">${book.price}</td>
                                 <td className="p-3">
                                     <span className={`px-2 py-1 rounded-full text-sm ${book.stock > 10 ? 'bg-green-100 text-green-800' :
-                                            book.stock > 0 ? 'bg-yellow-100 text-yellow-800' :
-                                                'bg-red-100 text-red-800'
+                                        book.stock > 0 ? 'bg-yellow-100 text-yellow-800' :
+                                            'bg-red-100 text-red-800'
                                         }`}>
                                         {book.stock} in stock
                                     </span>

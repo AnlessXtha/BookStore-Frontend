@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Trash2, ShoppingBag, ShoppingCart, User } from 'lucide-react';
 import { createApiClient } from '../lib/createApiClient';
 import { AuthContext } from '../context/AuthContext';
@@ -13,6 +13,7 @@ export function CartPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
     const apiClient = createApiClient("https://localhost:7086");
 
     const fetchCartItems = async (query = "", page = 1) => {
@@ -39,26 +40,53 @@ export function CartPage() {
         fetchCartItems(searchQuery);
     }, [searchQuery]);
 
-
-    const updateQuantity = async (bookId, newQuantity) => {
+    const increaseQuantity = async (bookId) => {
         try {
-            console.log(bookId, newQuantity)
-            const endpoint = `api/Cart/addQuantity?bookId=${bookId}&quantity=${newQuantity}`;
+            const endpoint = `api/Cart/increase/${bookId}`;
 
-            const response = await apiClient.post(endpoint, null, {
+            await apiClient.post(endpoint, null, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 }
             });
 
-            if (newQuantity < 1) return;
             setCart(cart.map(item =>
-                item.bookId === bookId ? { ...item, quantity: newQuantity } : item
+                item.bookId === bookId ? { ...item, quantity: item.quantity + 1 } : item
             ));
         } catch (error) {
-            console.error("Failed to update quantity:", error);
+            console.error("Failed to increase quantity:", error);
         }
-    }
+    };
+
+    const decreaseQuantity = async (bookId) => {
+        try {
+            const endpoint = `api/Cart/decrease/${bookId}`;
+
+            await apiClient.delete(endpoint, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            setCart(cart => {
+                const item = cart.find(i => i.bookId === bookId);
+                if (!item) return cart;
+
+                if (item.quantity > 1) {
+                    return cart.map(i =>
+                        i.bookId === bookId
+                            ? { ...i, quantity: i.quantity - 1 }
+                            : i
+                    );
+                } else {
+                    // Remove item entirely if quantity reaches 0
+                    return cart.filter(i => i.bookId !== bookId);
+                }
+            });
+        } catch (error) {
+            console.error("Failed to decrease quantity:", error);
+        }
+    };
 
     const removeItem = async (bookId) => {
         try {
@@ -83,6 +111,35 @@ export function CartPage() {
     const discount = cart.length >= 5 ? subtotal * 0.05 : 0;
     const total = subtotal - discount;
 
+    const checkout = async () => {
+        try {
+            const token = localStorage.getItem("token"); // or however you're storing it
+            const orderItems = cart.map(item => ({
+                bookId: item.bookId,
+                quantity: item.quantity
+            }));
+
+            const response = await apiClient.post("/add", { orderItems }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            if (response.data.success) {
+                alert(response.data.data); // sSow success message with bill and discounts
+                setCart([]); // clear cart in frontend
+                navigate('/myorders')
+            } else {
+                alert("Checkout failed: " + response.data.message);
+            }
+
+        } catch (error) {
+            console.error("Checkout error:", error);
+            alert("An error occurred during checkout. Please try again.");
+        }
+    };
+
+
     if (cart.length === 0) {
         return (
             <div className="min-h-screen bg-gray-50 flex  flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -101,81 +158,6 @@ export function CartPage() {
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <header className="bg-white shadow">
-                <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-                    <h1 className="text-2xl font-bold text-blue-700">CoverToCover</h1>
-                    <nav className="flex items-center space-x-6">
-                        {/* Cart Icon with Badge */}
-                        <Link
-                            to="/cart"
-                            className="relative text-gray-500 hover:text-gray-700"
-                        >
-                            <ShoppingCart className="h-6 w-6" />
-                            <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-indigo-600 rounded-full">
-                                {cart.length}
-                            </span>
-                        </Link>
-
-                        {/* Home Link */}
-                        <Link
-                            to="/"
-                            className="text-gray-600 hover:text-blue-600 active:text-blue-700"
-                        >
-                            Home
-                        </Link>
-
-                        {/* Catalogue Link */}
-                        <Link
-                            to="/catalogue"
-                            className="text-gray-600 hover:text-blue-600 active:text-blue-700"
-                        >
-                            Catalogue
-                        </Link>
-
-                        {/* About Link */}
-                        <Link
-                            to="/about"
-                            className="text-gray-600 hover:text-blue-600 active:text-blue-700"
-                        >
-                            About
-                        </Link>
-
-                        {/* Contact Link */}
-                        <Link
-                            to="/contact"
-                            className="text-gray-600 hover:text-blue-600 active:text-blue-700"
-                        >
-                            Contact
-                        </Link>
-
-                        {currentUser ? (
-                            <Link
-                                to="/"
-                                className="text-gray-600 hover:text-blue-600 active:text-blue-700 flex items-center gap-2"
-                            >
-                                <User className="h-6 w-6" />
-                                {currentUser?.firstName} {currentUser?.lastName}
-                            </Link>
-                        ) : (
-                            <>
-                                <Link
-                                    to="/login"
-                                    className="text-gray-600 hover:text-blue-600 active:text-blue-700"
-                                >
-                                    Login
-                                </Link>
-
-                                <Link
-                                    to="/register"
-                                    className="text-gray-600 hover:text-blue-600 active:text-blue-700"
-                                >
-                                    Register
-                                </Link>
-                            </>
-                        )}
-                    </nav>
-                </div>
-            </header>
             <h1 className="text-3xl font-lexend text-lg-bold text-gray-900">Shopping Cart</h1>
 
             <div className="mt-12 lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start">
@@ -215,7 +197,7 @@ export function CartPage() {
                                         <div className="mt-4 sm:mt-0 sm:pr-9">
                                             <div className="flex items-center">
                                                 <button
-                                                    onClick={() => updateQuantity(item.bookId, item.quantity - 1)}
+                                                    onClick={() => decreaseQuantity(item.bookId)}
                                                     className="p-1 text-gray-400 hover:text-gray-500"
                                                 >
                                                     -
@@ -223,11 +205,10 @@ export function CartPage() {
                                                 <input
                                                     type="number"
                                                     value={item.quantity}
-                                                    onChange={(e) => updateQuantity(item.bookId, parseInt(e.target.value))}
                                                     className="mx-2 w-16 text-center border-gray-300 rounded-md"
                                                 />
                                                 <button
-                                                    onClick={() => updateQuantity(item.bookId, item.quantity + 1)}
+                                                    onClick={() => increaseQuantity(item.bookId)}
                                                     className="p-1 text-gray-400 hover:text-gray-500"
                                                 >
                                                     +
@@ -275,6 +256,7 @@ export function CartPage() {
                             <button
                                 type="button"
                                 className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
+                                onClick={checkout}
                             >
                                 Checkout
                             </button>

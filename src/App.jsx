@@ -30,12 +30,6 @@ function App() {
         <Routes>
           <Route element={<MainLayout />}>
             <Route path="/" element={<HomePage />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/books" element={<BooksPage />} />
-            <Route path="/admin/users" element={<UsersPage />} />
-            <Route path="/admin/staff" element={<StaffManagement />} />
-            <Route path="/admin/add-book" element={<AddBookForm />} />
-
 
             <Route path="/cart" element={<CartPage />} />
             <Route path="/whitelist" element={<Whitelist />} />
@@ -49,6 +43,12 @@ function App() {
           {/* Routes without Navbar */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/books" element={<BooksPage />} />
+          <Route path="/admin/users" element={<UsersPage />} />
+          <Route path="/admin/staff" element={<StaffManagement />} />
+          <Route path="/admin/add-book" element={<AddBookForm />} />
         </Routes>
       </Router>
     </>

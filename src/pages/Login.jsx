@@ -57,8 +57,14 @@ function Login() {
         updateUser(response.data?.user);
         await localStorage.setItem("token", response.data.token);
         await fetchCartItems();
-  
+
         navigate("/");
+      } else if (response.data.user?.roles.includes("Admin")) {
+        updateUser(response.data?.user);
+        await localStorage.setItem("token", response.data.token);
+
+        navigate("/admin");
+
       }
 
     } catch (error) {

@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, User, Package, Clock, CheckCircle } from 'lucide-react';
 import { createApiClient } from '../lib/createApiClient';
 import { AuthContext } from '../context/AuthContext';
@@ -12,6 +12,7 @@ export function OrdersPage() {
     const [completedOrders, setCompletedOrders] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
     const apiClient = createApiClient("https://localhost:7086");
 
     const fetchOrders = async () => {
@@ -57,6 +58,10 @@ export function OrdersPage() {
     useEffect(() => {
         fetchOrders();
     }, []);
+
+    const viewDetails = async (orderId) => {
+        navigate(`/orderdetails/${orderId}`)
+    }
 
     const cancelOrder = async (orderId) => {
         try {
@@ -133,6 +138,9 @@ export function OrdersPage() {
                                                     Bill Amount
                                                 </th>
                                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Final Amount
+                                                </th>
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                     Operations
                                                 </th>
                                             </tr>
@@ -168,6 +176,12 @@ export function OrdersPage() {
                                                             Rs {order.finalAmount || 0}
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                            {/* <button
+                                                                onClick={() => viewDetails(item.orderId)}
+                                                                className="bg-red-600 hover:bg-red-700 text-white py-1 px-2 rounded text-xs"
+                                                            >
+                                                                View Details
+                                                            </button> */}
                                                             <button
                                                                 onClick={() => cancelOrder(item.orderId)}
                                                                 className="bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded text-xs"
@@ -224,6 +238,9 @@ export function OrdersPage() {
                                                     Bill Amount
                                                 </th>
                                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Final Amount
+                                                </th>
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                     Operations
                                                 </th>
                                             </tr>
@@ -253,6 +270,9 @@ export function OrdersPage() {
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                                             Rs {item.price || order.billAmount || 0}
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                            Rs {order.finalAmount || 0}
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                             <button
