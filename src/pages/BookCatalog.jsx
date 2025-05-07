@@ -74,7 +74,7 @@ const BookCatalog = () => {
     },
   ];
 
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, addToCart } = useContext(AuthContext);
   const token = localStorage.getItem("token");
 
   const [books, setBooks] = useState([]);
@@ -134,8 +134,11 @@ const BookCatalog = () => {
         },
       });
 
+      console.log(book, "book");
+
       // Optionally, you can update cart state here if needed
-      toast.success("Added to cart:", book.title);
+      toast.success(`Added to cart: ${book.title}`);
+      addToCart(book); // Assuming you have a function to update the cart in your context
     } catch (error) {
       console.error("Failed to add item to cart:", error);
     }

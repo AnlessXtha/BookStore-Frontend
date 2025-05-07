@@ -1,5 +1,10 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import React, { useContext } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import { CartPage } from "./pages/CartPage";
 import Login from "./pages/Login";
@@ -11,14 +16,20 @@ import { AdminDashboard } from "./pages/Admin/AdminPanel";
 import { BooksPage } from "./pages/Admin/BooksManagement";
 import { UsersPage } from "./pages/Admin/UserManagement";
 import { StaffManagement } from "./pages/Admin/StaffManagement";
-import { AddBookForm } from "./pages/Admin/AddBookForm";
+import AddBookForm from "./pages/AddBookForm";
+import EditBookForm from "./pages/EditBookForm";
 import BookCatalog from "./pages/BookCatalog";
 import OrdersPage from "./pages/MyOrders";
 import OrderDetails from "./pages/OrderDetails";
 import BookDetails from "./pages/BookDetails";
+import { AuthContext } from "./context/AuthContext";
 // import CataloguePage from "./pages/CataloguePage"; // Create this page too
 
 function App() {
+  const { currentUser } = useContext(AuthContext);
+
+  console.log(currentUser, "currentUser");
+
   return (
     <>
       <Router>
@@ -30,11 +41,10 @@ function App() {
             <Route path="/cart" element={<CartPage />} />
             <Route path="/whitelist" element={<Whitelist />} />
             <Route path="/catalogue" element={<BookCatalog />} />
-            <Route path="/bookdetails/:id" element={<BookDetails />} />
-            <Route path="/addBook" element={<AddBookForm />} />
             <Route path="/catalog" element={<BookCatalog />} />
             <Route path="/bookdetails/:id" element={<BookDetails />} />
             <Route path="/addBook" element={<AddBookForm />} />
+            <Route path="/editBook/:id" element={<EditBookForm />} />
             <Route path="/myorders" element={<OrdersPage />} />
             <Route path="/orderdetails/:id" element={<OrderDetails />} />
           </Route>

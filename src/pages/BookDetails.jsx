@@ -179,11 +179,11 @@ const BookDetails = () => {
                 <p>
                   <span className="font-semibold">ISBN:</span> {bookData.isbn}
                 </p>
-                <p>
+                {/* <p>
                   <span className="font-semibold">Stock:</span>{" "}
                   {bookData.stockQuantity}{" "}
                   {bookData.stockQuantity > 1 ? "copies" : "copy"} available
-                </p>
+                </p> */}
               </div>
             </div>
 

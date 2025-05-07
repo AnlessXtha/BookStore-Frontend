@@ -1,10 +1,15 @@
 import React, { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { Bookmark, ShoppingCart, User } from "lucide-react";
 
 function Navbar() {
-  const { currentUser } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const { currentUser, cart, updateUser } = useContext(AuthContext);
+
+  console.log("Current User:", currentUser);
+  console.log("Cart Items:", cart);
 
   const token = localStorage.getItem("token");
   return (
@@ -51,7 +56,7 @@ function Navbar() {
             >
               <ShoppingCart className="h-6 w-6" />
               <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-indigo-600 rounded-full">
-                {/* {cart.length} */}
+                {cart.length}
               </span>
             </Link>
             <Link
@@ -69,13 +74,29 @@ function Navbar() {
             </Link>
 
             {currentUser ? (
-              <Link
-                to="/"
-                className="text-gray-600 hover:text-blue-600 active:text-blue-700 flex items-center gap-2"
-              >
-                <User className="h-6 w-6" />
-                {currentUser?.firstName} {currentUser?.lastName}
-              </Link>
+              <>
+                <Link
+                  to="/"
+                  className="text-gray-600 hover:text-blue-600 active:text-blue-700 flex items-center gap-2"
+                >
+                  <User className="h-6 w-6" />
+                  {currentUser?.firstName} {currentUser?.lastName}
+                </Link>
+
+                <button
+                  className="text-white bg-blue-600 p-2 rounded-4xl hover:text-gray-100 active:text-blue-700"
+                  onClick={() => {
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("user");
+                    localStorage.removeItem("cart");
+                    navigate("/");
+
+                    updateUser(null);
+                  }}
+                >
+                  Log out
+                </button>
+              </>
             ) : (
               <>
                 <Link

@@ -3,10 +3,11 @@ import axios from "../api/axiosInstance";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, LogIn } from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
+import { createApiClient } from "../lib/createApiClient";
 
 function Login() {
   const navigate = useNavigate();
-  const { updateUser } = useContext(AuthContext);
+  const { updateUser, updateCart } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
@@ -17,10 +18,12 @@ function Login() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const apiClient = createApiClient("https://localhost:7086");
+
   const fetchCartItems = async (query = "", page = 1) => {
     setIsLoading(true);
     try {
-      const endpoint = 'api/Cart/my-cart';
+      const endpoint = "api/Cart/my-cart";
       const token = localStorage.getItem("token");
       if (!token) {
         setError("No token found. Please log in again.");
@@ -30,10 +33,10 @@ function Login() {
       const response = await apiClient.get(endpoint, {
         headers: {
           Authorization: `Bearer ${token}`,
-        }
+        },
       });
-      setCart(response.data.items || response.data);
-      updateCart(response.data.items || response.data);
+      // setCart(response.data.items || response.data);
+      updateCart(response.data.data || response.data);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch books.");
     } finally {
@@ -64,9 +67,7 @@ function Login() {
         await localStorage.setItem("token", response.data.token);
 
         navigate("/admin");
-
       }
-
     } catch (error) {
       setError(
         error.response?.data?.message || "Login failed. Please try again."
