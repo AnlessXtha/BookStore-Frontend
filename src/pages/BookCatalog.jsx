@@ -308,10 +308,13 @@ const BookCatalog = () => {
               >
                 Previous
               </button>
-              <span className="text-lg font-medium">Page {currentPage}</span>
+              <span className="text-lg font-medium">
+                Page {currentPage} of {totalPages}
+              </span>
               <button
                 onClick={() => handlePageChange(1)}
-                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded"
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
               >
                 Next
               </button>
