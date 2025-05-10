@@ -11,15 +11,13 @@ import {
     BookIcon
 } from 'lucide-react';
 
-const Sidebar = () => {
+export function StaffSidebar() {
     const [collapsed, setCollapsed] = useState(false);
     const location = useLocation();
 
     const menuItems = [
-        { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/' },
-        { name: 'Books', icon: <BookOpen size={20} />, path: '/admin/books' },
-        { name: 'Users', icon: <Users size={20} />, path: '/admin/users' },
-        { name: 'Staff', icon: <UserCog size={20} />, path: '/admin/staff' }
+        { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/staff' },
+        { name: 'Users', icon: <Users size={20} />, path: '/staff/users' },
     ];
 
     const handleLogout = () => {
@@ -49,8 +47,8 @@ const Sidebar = () => {
                             <Link
                                 to={item.path}
                                 className={`flex items-center gap-3 px-4 py-3 transition-all duration-200 ${location.pathname === item.path
-                                        ? 'bg-blue-800 text-white border-l-4 border-amber-400'
-                                        : 'text-blue-100 hover:bg-blue-800 hover:text-white'
+                                    ? 'bg-blue-800 text-white border-l-4 border-amber-400'
+                                    : 'text-blue-100 hover:bg-blue-800 hover:text-white'
                                     }`}
                             >
                                 {item.icon}
@@ -72,4 +70,3 @@ const Sidebar = () => {
     );
 };
 
-export default Sidebar;

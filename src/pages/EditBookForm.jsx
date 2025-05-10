@@ -1,8 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import { createApiClient } from "../../lib/createApiClient";
+import { createApiClient } from "../lib/createApiClient";
 
-export function AddBookForm () {
+const EditBookForm = () => {
+  const navigate = useNavigate();
+
+  const { id } = useParams();
+  const apiClient = createApiClient("https://localhost:7086");
+
   const [form, setForm] = useState({
     title: "",
     author: "",
@@ -19,7 +25,38 @@ export function AddBookForm () {
 
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
-  const [response, setResponse] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBook = async () => {
+      try {
+        const res = await apiClient.get(`/api/Books/${id}`);
+        const book = res.data;
+        setForm({
+          title: book.title,
+          author: book.author,
+          genre: book.genre,
+          language: book.language,
+          publisher: book.publisher,
+          format: book.format,
+          isbn: book.isbn,
+          stockQuantity: book.stockQuantity,
+          price: book.price,
+          isAvailable: book.isAvailable,
+          publicationDate: book.publicationDate?.split("T")[0] || "",
+        });
+        if (book.imagePath) {
+          setPreview(`https://localhost:7086${book.imagePath}`);
+        }
+      } catch (err) {
+        toast.error("Failed to load book.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBook();
+  }, [id]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -34,8 +71,6 @@ export function AddBookForm () {
     setImage(file);
     setPreview(URL.createObjectURL(file));
   };
-
-  const apiClient = createApiClient("https://localhost:7086");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,42 +88,31 @@ export function AddBookForm () {
     if (image) formData.append("image", image);
 
     try {
-      const res = await apiClient.post("/api/books", formData, {
+      await apiClient.put(`/api/Books/${id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      setResponse("Book added successfully!");
-      toast.success("Book added successfully!");
-
-      setForm({
-        title: "",
-        author: "",
-        genre: "",
-        language: "",
-        publisher: "",
-        format: "",
-        isbn: "",
-        stockQuantity: 0,
-        price: 0,
-        isAvailable: true,
-        publicationDate: "",
-      });
-      setImage(null);
-      setPreview(null);
-      console.log(res.data);
+      toast.success("Book updated successfully!");
+      navigate("/admin/books");
     } catch (err) {
       console.error(err);
-      setResponse("Failed to add book.");
-      toast.error("Failed to add book.");
+      toast.error("Failed to update book.");
     }
   };
+
+  if (loading) {
+    return (
+      <p className="text-center mt-8 text-lg text-gray-700">
+        Loading book details...
+      </p>
+    );
+  }
 
   return (
     <div className="max-w-2xl mx-auto p-6 border rounded-lg shadow-md bg-white mt-6">
       <h2 className="text-2xl font-bold mb-6 text-center text-blue-800">
-        Add New Book
+        Edit Book
       </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Row 1: Title & Author */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block mb-1 font-semibold text-gray-700">
@@ -118,7 +142,6 @@ export function AddBookForm () {
           </div>
         </div>
 
-        {/* Row 2: Genre & Language */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block mb-1 font-semibold text-gray-700">
@@ -148,7 +171,6 @@ export function AddBookForm () {
           </div>
         </div>
 
-        {/* Row 3: Publisher & Format */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block mb-1 font-semibold text-gray-700">
@@ -178,7 +200,6 @@ export function AddBookForm () {
           </div>
         </div>
 
-        {/* Row 4: ISBN (alone) */}
         <div>
           <label className="block mb-1 font-semibold text-gray-700">ISBN</label>
           <input
@@ -191,7 +212,6 @@ export function AddBookForm () {
           />
         </div>
 
-        {/* Row 5: Stock & Price */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block mb-1 font-semibold text-gray-700">
@@ -222,7 +242,6 @@ export function AddBookForm () {
           </div>
         </div>
 
-        {/* Publication Date & Availability */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block mb-1 font-semibold text-gray-700">
@@ -249,20 +268,17 @@ export function AddBookForm () {
           </div>
         </div>
 
-        {/* Fancy Image Upload */}
         <div>
           <label className="block mb-1 font-semibold text-gray-700">
-            Upload Book Cover
+            Upload New Book Cover
           </label>
           <div className="border border-dashed border-gray-400 rounded-md p-4 flex flex-col items-center">
-            {preview ? (
+            {preview && (
               <img
                 src={preview}
                 alt="Preview"
                 className="w-40 h-60 object-cover mb-3 rounded shadow"
               />
-            ) : (
-              <p className="text-gray-500 mb-2">Drag or select image</p>
             )}
             <input
               type="file"
@@ -278,16 +294,11 @@ export function AddBookForm () {
           type="submit"
           className="w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded"
         >
-          Submit
+          Update Book
         </button>
       </form>
-
-      {response && (
-        <p className="mt-4 text-center text-lg font-medium text-gray-700">
-          {response}
-        </p>
-      )}
     </div>
   );
 };
 
+export default EditBookForm;

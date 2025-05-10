@@ -27,7 +27,7 @@ export function Whitelist() {
 
                 const response = await apiClient.get(endpoint, {
                     headers: {
-                        Authorization: `Bearer ${token}`, 
+                        Authorization: `Bearer ${token}`,
                     }
                 });
 
@@ -175,11 +175,7 @@ export function Whitelist() {
 
                                 <div className="flex items-center justify-between mb-3">
                                     <span className="text-base font-semibold text-gray-900">Rs {book?.price?.toFixed(2)}</span>
-                                    <span className={`flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${book.isAvailable ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                                        }`}>
-                                        {book.isAvailable ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
-                                        {book.isAvailable ? 'Available' : 'Out of Stock'}
-                                    </span>
+                                    
                                 </div>
 
                                 <div className="flex items-center justify-between text-xs text-gray-500">

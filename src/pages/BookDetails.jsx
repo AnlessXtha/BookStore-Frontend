@@ -2,10 +2,11 @@ import React, { useState, useEffect, useContext } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 // import HP from "../assets/hp.png";
 
+// import HP from "../assets/hp.png";
+
 import toast from "react-hot-toast";
 import { AuthContext } from "../context/AuthContext";
 import { createApiClient } from "../lib/createApiClient";
-import axios from "axios";
 
 const BookDetails = () => {
   const { id } = useParams();
@@ -79,7 +80,7 @@ const BookDetails = () => {
         });
 
         // Optionally, you can update cart state here if needed
-        toast.success("Added to cart:", bookData.title);
+        toast.success(`Added to cart: ${bookData.title}`);
       } catch (error) {
         console.error("Failed to add item to cart:", error);
       }
@@ -127,26 +128,6 @@ const BookDetails = () => {
     );
   };
 
-  const submitRating = async (bookId, stars, review) => {
-    const token = localStorage.getItem("token");
-    try {
-      const response = await axios.post("/api/rate", {
-        bookId,
-        stars,
-        review
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      alert(response.data.data); // "Rating submitted successfully!"
-    } catch (err) {
-      alert(err.response.data.message); // "You can only rate books you've purchased."
-    }
-  };
-
-
   if (loading) return <div className="text-center py-10">Loading...</div>;
   if (error)
     return <div className="text-center text-red-500 py-10">{error}</div>;
@@ -157,7 +138,7 @@ const BookDetails = () => {
         <div className="flex flex-col md:flex-row gap-8">
           <div className="md:w-1/3">
             <img
-              src={bookData.coverImage || "/fallback.jpg"}
+              src={bookData.coverImage}
               alt={`${bookData.title} book cover`}
               className="w-full shadow-lg"
             />
@@ -198,11 +179,11 @@ const BookDetails = () => {
                 <p>
                   <span className="font-semibold">ISBN:</span> {bookData.isbn}
                 </p>
-                <p>
+                {/* <p>
                   <span className="font-semibold">Stock:</span>{" "}
                   {bookData.stockQuantity}{" "}
                   {bookData.stockQuantity > 1 ? "copies" : "copy"} available
-                </p>
+                </p> */}
               </div>
             </div>
 

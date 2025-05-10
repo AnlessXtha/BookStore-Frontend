@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { createApiClient } from "../lib/createApiClient";
 import toast from "react-hot-toast";
 import { AuthContext } from "../context/AuthContext";
-import { Search } from "lucide-react";
+import { Heart, Search, ShoppingCart } from "lucide-react";
 
 const BookCatalog = () => {
     const navigate = useNavigate();
@@ -100,7 +100,7 @@ const BookCatalog = () => {
             )}&pageNumber=${page}&pageSize=${pageSize}&genre=${genre}&sort=${sort}`;
 
             const response = await apiClient.get(endpoint);
-            setBooks(response.data || []);
+            setBooks(response.data?.items || []);
             setTotalPages(response.data.totalPages);
         } catch (err) {
             setBooks([]);
@@ -133,9 +133,9 @@ const BookCatalog = () => {
                     Authorization: `Bearer ${token}`, // ensure token is valid
                 },
             });
-
+            console.log(book.title)
             // Optionally, you can update cart state here if needed
-            toast.success("Added to cart:", book.title);
+            toast.success(`Added to cart: ${book.title}`);
         } catch (error) {
             console.error("Failed to add item to cart:", error);
         }
@@ -152,7 +152,7 @@ const BookCatalog = () => {
             });
 
             // Optionally, you can update cart state here if needed
-            toast.success("Added to Whitelist:", book.title);
+            toast.success("Added to Whitelist: " + book.title);
         } catch (error) {
             console.error("Failed to add item to whitelist:", error);
         }
@@ -270,9 +270,10 @@ const BookCatalog = () => {
                                                     handleAddToCart(book);
                                                 }
                                             }}
-                                            className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded"
+                                            className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded flex items-center gap-1 transition-colors"
                                         >
-                                            Add to Cart
+                                            <ShoppingCart size={14} />
+                                            <span className="hidden sm:inline">Add</span>
                                         </button>
                                         <button
                                             onClick={(e) => {
@@ -288,9 +289,10 @@ const BookCatalog = () => {
                                                     handleAddToWhitelist(book);
                                                 }
                                             }}
-                                            className="bg-gray-200 hover:bg-gray-300 text-sm px-3 py-1 rounded"
+                                            className="bg-gray-200 hover:bg-gray-300 text-sm px-3 py-1 rounded flex items-center gap-1 transition-colors"
                                         >
-                                            Whitelist
+                                            <Heart size={14} />
+                                            <span className="hidden sm:inline">Save</span>
                                         </button>
                                     </div>
                                 </div>
