@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { createApiClient } from "../../lib/createApiClient";
 import toast from "react-hot-toast";
+import Sidebar from "./Sidebar";
 
 export function BooksPage() {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ export function BooksPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const { currentUser } = useContext(AuthContext);
   const token = localStorage.getItem("token");
@@ -50,7 +52,7 @@ export function BooksPage() {
       setBooks(response.data.items || response.data);
       setTotalPages(response.data.totalPages || 1);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch books.");
+      toast.error(err.response?.data?.message || "Failed to fetch books.");
     } finally {
       setIsLoading(false);
     }
@@ -60,21 +62,18 @@ export function BooksPage() {
     fetchBooks(searchQuery, currentPage);
   }, [searchQuery, currentPage]);
 
-  console.log(books);
   const handleAddBook = () => {
-    navigate("/addBook");
+    navigate("/admin/add-book");
   };
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [bookToDelete, setBookToDelete] = useState(null);
 
-  // Handle delete click
   const handleDeleteClick = (book) => {
     setBookToDelete(book);
     setShowDeleteDialog(true);
   };
 
-  // Confirm and delete
   const confirmDelete = async () => {
     if (!bookToDelete) return;
     try {
@@ -84,7 +83,7 @@ export function BooksPage() {
         },
       });
       toast.success(`Deleted "${bookToDelete.title}"`);
-      fetchBooks(searchQuery, currentPage); // Refresh book list
+      fetchBooks(searchQuery, currentPage);
     } catch (err) {
       toast.error(err?.response?.data?.message || "Failed to delete book.");
     } finally {
@@ -99,121 +98,131 @@ export function BooksPage() {
   };
 
   return (
-    <div className="p-6 space-y-6 animate-fadeIn">
-      <div className="flex flex-col md:flex-row justify-between gap-4">
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Search books..."
-            className="w-full md:w-80 pl-10 pr-4 py-2 border rounded-lg"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
-        </div>
+    <div className="flex h-screen bg-gray-100">
+      <Sidebar collapsed={sidebarCollapsed} onCollapse={setSidebarCollapsed} />
+      
+      <div className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'ml-20' : 'ml-64'}`}>
+        <div className="p-6 space-y-6">
+          <div className="flex flex-col md:flex-row justify-between gap-4">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search books..."
+                className="w-full md:w-80 pl-10 pr-4 py-2 border rounded-lg"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
+            </div>
 
-        <div className="flex gap-2">
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center gap-2 hover:bg-blue-700">
-            <Plus size={20} onClick={handleAddBook} />
-            Add Book
-          </button>
-          <button
-            className="px-4 py-2 border rounded-lg flex items-center gap-2 hover:bg-gray-50"
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            <Filter size={20} />
-            Filters
-          </button>
-        </div>
-      </div>
+            <div className="flex gap-2">
+              <button 
+                onClick={handleAddBook}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center gap-2 hover:bg-blue-700"
+              >
+                <Plus size={20} />
+                Add Book
+              </button>
+              <button
+                className="px-4 py-2 border rounded-lg flex items-center gap-2 hover:bg-gray-50"
+                onClick={() => setShowFilters(!showFilters)}
+              >
+                <Filter size={20} />
+                Filters
+              </button>
+            </div>
+          </div>
 
-      <div className="flex gap-2 overflow-x-auto pb-2">
-        {filters.map((filter) => (
-          <button
-            key={filter.id}
-            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap
-              ${
-                activeFilter === filter.id
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-              }`}
-            onClick={() => setActiveFilter(filter.id)}
-          >
-            {filter.name}
-          </button>
-        ))}
-      </div>
-
-      <div className="overflow-auto">
-        <table className="min-w-full table-auto border rounded-lg shadow-sm">
-          <thead>
-            <tr className="bg-gray-100 text-left text-sm font-semibold text-gray-700">
-              <th className="p-3">Cover</th>
-              <th className="p-3">Title</th>
-              <th className="p-3">Author</th>
-              <th className="p-3">Genre</th>
-              <th className="p-3">Price</th>
-              <th className="p-3">Stock</th>
-              <th className="p-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredBooks?.map((book) => (
-              <tr key={book.bookId} className="border-b hover:bg-gray-50">
-                <td className="p-3">
-                  <img
-                    src={book.cover}
-                    alt={book.title}
-                    className="w-16 h-20 object-cover rounded"
-                  />
-                </td>
-                <td className="p-3 font-medium">{book.title}</td>
-                <td className="p-3 text-gray-600">{book.author}</td>
-                <td className="p-3">
-                  <div className="flex flex-wrap gap-1">{book.genre}</div>
-                </td>
-                <td className="p-3 font-semibold">Rs. {book.price}</td>
-                <td className="p-3">
-                  <span
-                    className={`px-2 py-1 rounded-full text-sm ${
-                      book.stock > 10
-                        ? "bg-green-100 text-green-800"
-                        : book.stock > 0
-                        ? "bg-yellow-100 text-yellow-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {book.stock} in stock
-                  </span>
-                </td>
-                <td className="p-3 flex gap-2">
-                  <button
-                    onClick={() => {
-                      navigate(`/editBook/${book.bookId}`);
-                    }}
-                    className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteClick(book)}
-                    className="px-3 py-1 border border-red-600 text-red-600 text-sm rounded hover:bg-red-50"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            {filters.map((filter) => (
+              <button
+                key={filter.id}
+                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap
+                  ${
+                    activeFilter === filter.id
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                  }`}
+                onClick={() => setActiveFilter(filter.id)}
+              >
+                {filter.name}
+              </button>
             ))}
-            {filteredBooks.length === 0 && (
-              <tr>
-                <td colSpan="7" className="p-4 text-center text-gray-500">
-                  No books found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+          </div>
+
+          <div className="overflow-auto">
+            <table className="min-w-full table-auto border rounded-lg shadow-sm">
+              <thead>
+                <tr className="bg-gray-100 text-left text-sm font-semibold text-gray-700">
+                  <th className="p-3">Cover</th>
+                  <th className="p-3">Title</th>
+                  <th className="p-3">Author</th>
+                  <th className="p-3">Genre</th>
+                  <th className="p-3">Price</th>
+                  <th className="p-3">Stock</th>
+                  <th className="p-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredBooks?.map((book) => (
+                  <tr key={book.bookId} className="border-b hover:bg-gray-50">
+                    <td className="p-3">
+                      <img
+                        src={book.cover}
+                        alt={book.title}
+                        className="w-16 h-20 object-cover rounded"
+                      />
+                    </td>
+                    <td className="p-3 font-medium">{book.title}</td>
+                    <td className="p-3 text-gray-600">{book.author}</td>
+                    <td className="p-3">
+                      <div className="flex flex-wrap gap-1">{book.genre}</div>
+                    </td>
+                    <td className="p-3 font-semibold">Rs. {book.price}</td>
+                    <td className="p-3">
+                      <span
+                        className={`px-2 py-1 rounded-full text-sm ${
+                          book.stock > 10
+                            ? "bg-green-100 text-green-800"
+                            : book.stock > 0
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {book.stock} in stock
+                      </span>
+                    </td>
+                    <td className="p-3 flex gap-2">
+                      <button
+                        onClick={() => {
+                          navigate(`/admin/edit-book/${book.bookId}`);
+                        }}
+                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(book)}
+                        className="px-3 py-1 border border-red-600 text-red-600 text-sm rounded hover:bg-red-50"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {filteredBooks.length === 0 && (
+                  <tr>
+                    <td colSpan="7" className="p-4 text-center text-gray-500">
+                      No books found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
+
       {showDeleteDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.5)]">
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">

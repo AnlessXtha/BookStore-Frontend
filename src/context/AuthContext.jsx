@@ -38,6 +38,14 @@ export const AuthContextProvider = ({ children }) => {
     setCart((prevCart) => prevCart.filter((item) => item.bookId !== bookId));
   };
 
+  const logout = () => {
+    setCurrentUser(null);
+    setCart([]);
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("cart");
+  };
+
   useEffect(() => {
     localStorage.setItem("user", JSON.stringify(currentUser));
   }, [currentUser]);
@@ -55,6 +63,7 @@ export const AuthContextProvider = ({ children }) => {
         updateCart,
         addToCart,
         removeFromCart,
+        logout,
       }}
     >
       {children}

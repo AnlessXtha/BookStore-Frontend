@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BookOpen, Users, Percent, ShoppingBag } from 'lucide-react';
 import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
@@ -7,11 +7,13 @@ import Sidebar from './Sidebar';
 ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
 
 export function AdminDashboard() {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
   const stats = [
-    { title: 'Total Books', value: '1,238', icon: <BookOpen size={24} />, trend: { value: 12.5, isUpward: true } },
-    { title: 'Active Members', value: '842', icon: <Users size={24} />, trend: { value: 8.2, isUpward: true } },
-    { title: 'Active Discounts', value: '6', icon: <Percent size={24} />, trend: { value: 2, isUpward: false } },
-    { title: 'Monthly Orders', value: '156', icon: <ShoppingBag size={24} />, trend: { value: 18.3, isUpward: true } }
+    { title: 'Total Books', value: '1,238', icon: <BookOpen size={24} /> },
+    { title: 'Total Users', value: '842', icon: <Users size={24} /> },
+    { title: 'Active Discounts', value: '6', icon: <Percent size={24} /> },
+    { title: 'Monthly Orders', value: '156', icon: <ShoppingBag size={24} /> }
   ];
 
   const salesData = {
@@ -51,16 +53,11 @@ export function AdminDashboard() {
   };
 
   return (
-    <div className="p-4 md:p-6 space-y-6 animate-fadeIn">
-      {/* Sidebar + Content wrapper for better responsiveness */}
-      <div className="flex flex-col lg:flex-row gap-4">
-        {/* Sidebar */}
-        <aside className="w-full lg:w-1/5">
-          <Sidebar />
-        </aside>
-  
-        {/* Main content */}
-        <main className="flex-1 space-y-6">
+    <div className="flex h-screen bg-gray-100">
+      <Sidebar collapsed={sidebarCollapsed} onCollapse={setSidebarCollapsed} />
+      
+      <div className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'ml-20' : 'ml-64'}`}>
+        <div className="p-4 md:p-6 space-y-6">
           {/* Stats Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {stats.map((stat, index) => (
@@ -69,19 +66,13 @@ export function AdminDashboard() {
                   <div>
                     <p className="text-sm text-gray-500">{stat.title}</p>
                     <h3 className="text-2xl font-bold mt-1">{stat.value}</h3>
-                    <div className="flex items-center mt-2">
-                      <span className={`text-sm font-medium ${stat.trend.isUpward ? 'text-green-600' : 'text-red-600'}`}>
-                        {stat.trend.isUpward ? '+' : '-'}{Math.abs(stat.trend.value)}%
-                      </span>
-                      <span className="text-xs text-gray-500 ml-1">vs last month</span>
-                    </div>
                   </div>
                   <div className="p-2 bg-blue-50 rounded-lg">{stat.icon}</div>
                 </div>
               </div>
             ))}
           </div>
-  
+
           {/* Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Sales Overview */}
@@ -91,7 +82,7 @@ export function AdminDashboard() {
                 <Line data={salesData} options={{ maintainAspectRatio: false, responsive: true }} />
               </div>
             </div>
-  
+
             {/* Genre Overview */}
             <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md">
               <h2 className="text-lg font-semibold mb-4">Popular Genres</h2>
@@ -100,7 +91,7 @@ export function AdminDashboard() {
               </div>
             </div>
           </div>
-  
+
           {/* Users + Orders Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* New Users */}
@@ -110,7 +101,7 @@ export function AdminDashboard() {
                 <Bar data={userRegistrations} options={{ maintainAspectRatio: false, responsive: true }} />
               </div>
             </div>
-  
+
             {/* Recent Orders */}
             <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md">
               <h2 className="text-lg font-semibold mb-4">Recent Orders</h2>
@@ -144,10 +135,9 @@ export function AdminDashboard() {
               </div>
             </div>
           </div>
-        </main>
+        </div>
       </div>
     </div>
   );
-  
-};
+}
 

@@ -16,10 +16,6 @@ import OrderDetails from "./pages/OrderDetails";
 import BookDetails from "./pages/BookDetails";
 import BookCatalog from "./pages/BookCatalog";
 import AddBookForm from "./pages/AddBookForm";
-<<<<<<< HEAD
-import OrdersPage from "./pages/MyOrders";
-import OrderDetails from "./pages/OrderDetails";
-=======
 import EditBookForm from "./pages/EditBookForm";
 
 import MainLayout from "./components/MainLayout";
@@ -92,22 +88,6 @@ const App = () => {
             "Login as a member to view order details."
           ),
         },
-        // {
-        //   path: "addBook",
-        //   element: withAuth(
-        //     <AddBookForm />,
-        //     isMember,
-        //     "Only members can add books."
-        //   ),
-        // },
-        // {
-        //   path: "editBook/:id",
-        //   element: withAuth(
-        //     <EditBookForm />,
-        //     isMember,
-        //     "Only members can edit books."
-        //   ),
-        // },
       ],
     },
     {
@@ -144,34 +124,11 @@ const App = () => {
       element: <Navigate to="/" replace />,
     },
   ]);
->>>>>>> b3acdfd80fb5f37ce8afd94ff35a49d62e48f4b8
 
   return (
     <>
-<<<<<<< HEAD
-      <Router>
-        <Toaster position="top-center" reverseOrder={false} />
-        <Routes>
-          <Route element={<MainLayout />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/cart" element={<CartPage />} />
-            <Route path="/whitelist" element={<Whitelist />} />
-            <Route path="/catalogue" element={<BookCatalog />} />
-            <Route path="/bookdetails/:id" element={<BookDetails />} />
-            <Route path="/addBook" element={<AddBookForm />} />
-            <Route path="/myorders" element={<OrdersPage />} />
-            <Route path="/orderdetails/:id" element={<OrderDetails />} />
-          </Route>
-
-          {/* Routes without Navbar */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-        </Routes>
-      </Router>
-=======
       <Toaster position="top-center" reverseOrder={false} />
       <RouterProvider router={router} />
->>>>>>> b3acdfd80fb5f37ce8afd94ff35a49d62e48f4b8
     </>
   );
 };

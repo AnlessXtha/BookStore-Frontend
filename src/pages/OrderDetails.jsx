@@ -22,11 +22,7 @@ export function OrderDetails() {
             setIsLoading(true);
             try {
                 // Fetch specific order details
-<<<<<<< HEAD
-                const orderEndpoint = `api/Orders/${orderId}`;
-=======
                 const orderEndpoint = `api/Orders`;
->>>>>>> b3acdfd80fb5f37ce8afd94ff35a49d62e48f4b8
                 const orderResponse = await apiClient.get(orderEndpoint, {
                     headers: {
                         Authorization: `Bearer ${token}`,
