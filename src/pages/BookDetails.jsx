@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { createApiClient } from "../lib/createApiClient";
 import HP from "../assets/hp.png";
+
+// import HP from "../assets/hp.png";
 
 import toast from "react-hot-toast";
 import { AuthContext } from "../context/AuthContext";
+import { createApiClient } from "../lib/createApiClient";
 
 const BookDetails = () => {
   const { id } = useParams();
@@ -177,11 +179,11 @@ const BookDetails = () => {
                 <p>
                   <span className="font-semibold">ISBN:</span> {bookData.isbn}
                 </p>
-                <p>
+                {/* <p>
                   <span className="font-semibold">Stock:</span>{" "}
                   {bookData.stockQuantity}{" "}
                   {bookData.stockQuantity > 1 ? "copies" : "copy"} available
-                </p>
+                </p> */}
               </div>
             </div>
 

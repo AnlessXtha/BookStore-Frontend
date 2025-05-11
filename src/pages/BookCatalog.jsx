@@ -74,7 +74,7 @@ const BookCatalog = () => {
     },
   ];
 
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, addToCart } = useContext(AuthContext);
   const token = localStorage.getItem("token");
 
   const [books, setBooks] = useState([]);
@@ -134,8 +134,11 @@ const BookCatalog = () => {
         },
       });
 
+      console.log(book, "book");
+
       // Optionally, you can update cart state here if needed
-      toast.success("Added to cart:", book.title);
+      toast.success(`Added to cart: ${book.title}`);
+      addToCart(book); // Assuming you have a function to update the cart in your context
     } catch (error) {
       console.error("Failed to add item to cart:", error);
     }
@@ -305,10 +308,13 @@ const BookCatalog = () => {
               >
                 Previous
               </button>
-              <span className="text-lg font-medium">Page {currentPage}</span>
+              <span className="text-lg font-medium">
+                Page {currentPage} of {totalPages}
+              </span>
               <button
                 onClick={() => handlePageChange(1)}
-                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded"
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
               >
                 Next
               </button>
