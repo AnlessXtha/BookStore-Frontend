@@ -7,6 +7,7 @@ import { AuthContext } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import SearchBar from './SearchBar';
 import { Link } from 'react-router-dom';
+import OrderNotifications from './OrderNotifications';
 // import mockBooks from './data/mockBooks';
 
 const HomePage = () => {
@@ -129,7 +130,7 @@ const HomePage = () => {
       {/* Notification Bar */}
       <div className="bg-black text-white py-2 px-4 flex items-center justify-center gap-2">
         <Bell size={16} className="text-yellow-400" />
-        <p className="text-sm">{recentPurchase.customerName} just purchased {recentPurchase.bookTitle}</p>
+        < OrderNotifications />
       </div>
 
       {/* Hero Section */}

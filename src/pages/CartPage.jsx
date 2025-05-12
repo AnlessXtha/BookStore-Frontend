@@ -120,6 +120,7 @@ export function CartPage() {
       const orderItems = cart.map((item) => ({
         bookId: item.bookId,
         quantity: item.quantity,
+        bookTitle: item.title
       }));
 
       const response = await apiClient.post(

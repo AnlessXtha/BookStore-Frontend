@@ -22,6 +22,7 @@ import { AuthContext } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoutes";
 import EditBookForm from "./pages/EditBookForm";
 import UserProfile from "./pages/UserProfile";
+import OrderNotifications from "./pages/OrderNotifications";
 // import CataloguePage from "./pages/CataloguePage"; // Create this page too
 
 function App() {
@@ -83,6 +84,14 @@ function App() {
             <OrdersPage />,
             isMember,
             "Login as a member to view your orders."
+          ),
+        },
+         {
+          path: "notifications",
+          element: withAuth(
+            <OrderNotifications />,
+            isMember,
+            "Login as a member to view your notifications."
           ),
         },
         {
