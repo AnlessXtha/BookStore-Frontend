@@ -23,6 +23,7 @@ import { AdminDashboard } from "./pages/Admin/AdminPanel";
 import { BooksPage } from "./pages/Admin/BooksManagement";
 import { UsersPage } from "./pages/Admin/UserManagement";
 import { StaffManagement } from "./pages/Admin/StaffManagement";
+import BannerManagement from "./pages/Admin/BannerManagement";
 
 import { AuthContext } from "./context/AuthContext";
 import { Toaster } from "react-hot-toast";
@@ -108,6 +109,10 @@ const App = () => {
         {
           path: "staff",
           element: withAuth(<StaffManagement />, isAdmin, "Admin access only."),
+        },
+        {
+          path: "banners",
+          element: withAuth(<BannerManagement />, isAdmin, "Admin access only."),
         },
         {
           path: "add-book",

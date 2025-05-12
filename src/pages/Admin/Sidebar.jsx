@@ -8,7 +8,8 @@ import {
     ChevronLeft,
     ChevronRight,
     LogOut,
-    BookIcon
+    BookIcon,
+    Image
 } from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
 import { useContext } from 'react';
@@ -22,7 +23,8 @@ const Sidebar = ({ collapsed, onCollapse }) => {
         { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/admin' },
         { name: 'Books', icon: <BookOpen size={20} />, path: '/admin/books' },
         { name: 'Users', icon: <Users size={20} />, path: '/admin/users' },
-        { name: 'Staff', icon: <UserCog size={20} />, path: '/admin/staff' }
+        { name: 'Staff', icon: <UserCog size={20} />, path: '/admin/staff' },
+        { name: 'Banners', icon: <Image size={20} />, path: '/admin/banners' }
     ];
 
     const handleLogout = () => {
