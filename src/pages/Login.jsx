@@ -67,6 +67,11 @@ function Login() {
         await localStorage.setItem("token", response.data.token);
 
         navigate("/admin");
+      } else if (response.data.user?.roles.includes("Staff")) {
+        updateUser(response.data?.user);
+        await localStorage.setItem("token", response.data.token);
+
+        navigate("/staff");
       }
     } catch (error) {
       setError(

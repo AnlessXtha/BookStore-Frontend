@@ -23,11 +23,24 @@ const BookDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // New state for reviews
+  const [reviews, setReviews] = useState([]);
+  const [hasPurchased, setHasPurchased] = useState(false);
+  const [reviewForm, setReviewForm] = useState({
+    rating: 5,
+    comment: "",
+  });
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
   useEffect(() => {
     const fetchBookDetails = async () => {
       try {
         const response = await apiClient.get(`/api/Books/${id}`);
         setBookData(response.data);
+        fetchReviews();
+        if (currentUser) {
+          checkPurchaseStatus();
+        }
       } catch (err) {
         setError("Failed to load book details.");
       } finally {
@@ -36,7 +49,80 @@ const BookDetails = () => {
     };
 
     fetchBookDetails();
-  }, [id]);
+  }, [id, currentUser]);
+
+  const checkPurchaseStatus = async () => {
+    try {
+      const response = await apiClient.get(`/api/Review/has-purchased/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setHasPurchased(response.data.success);
+    } catch (error) {
+      setHasPurchased(false);
+    }
+  };
+
+  const fetchReviews = async () => {
+    try {
+      const response = await apiClient.get(`/api/Review/Get-Book/${id}`);
+      console.log("Full Review Response:", response); // Debug full response
+      console.log("Review Data:", response.data); // Debug data specifically
+      if (response.data.success) {
+        const reviewsData = response.data.data || [];
+        console.log("Reviews Array:", reviewsData); // Debug reviews array
+        setReviews(reviewsData);
+      } else {
+        setReviews([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch reviews:", error);
+      setReviews([]);
+    }
+  };
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!currentUser) {
+      toast.error("Please log in to submit a review.");
+      navigate("/login");
+      return;
+    }
+
+    if (!hasPurchased) {
+      toast.error("You must purchase this book to leave a review.");
+      return;
+    }
+
+    setIsSubmittingReview(true);
+    try {
+      const reviewData = {
+        ...reviewForm,
+        bookId: parseInt(id),
+        date: new Date().toISOString(),
+      };
+
+      console.log("Submitting review data:", reviewData); // Debug review submission
+
+      const response = await apiClient.post("/api/Review/add", reviewData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log("Review submission response:", response); // Debug submission response
+
+      toast.success("Review submitted successfully!");
+      setReviewForm({ rating: 5, comment: "" });
+      fetchReviews();
+    } catch (error) {
+      console.error("Review submission error:", error);
+      toast.error(error.response?.data?.message || "Failed to submit review.");
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
 
   const handleAddToWhitelist = async () => {
     if (!currentUser) {
@@ -138,7 +224,7 @@ const BookDetails = () => {
         <div className="flex flex-col md:flex-row gap-8">
           <div className="md:w-1/3">
             <img
-              src={bookData.coverImage || HP || "/fallback.jpg"}
+              src={`https://localhost:7086${bookData.imagePath} `}
               alt={`${bookData.title} book cover`}
               className="w-full shadow-lg"
             />
@@ -219,6 +305,108 @@ const BookDetails = () => {
                   : "Add to Cart"}
               </button>
             </div>
+          </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="mt-12 bg-white p-8 shadow rounded-lg">
+          <h2 className="text-2xl font-bold mb-6">Reviews</h2>
+
+          {/* Review Form */}
+          {currentUser && hasPurchased && (
+            <form
+              onSubmit={handleReviewSubmit}
+              className="mb-8 p-6 bg-gray-50 rounded-lg"
+            >
+              <h3 className="text-lg font-semibold mb-4">Write a Review</h3>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Rating
+                </label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() =>
+                        setReviewForm((prev) => ({ ...prev, rating: star }))
+                      }
+                      className={`text-2xl ${
+                        star <= reviewForm.rating
+                          ? "text-yellow-500"
+                          : "text-gray-300"
+                      }`}
+                    >
+                      ★
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Comment
+                </label>
+                <textarea
+                  value={reviewForm.comment}
+                  onChange={(e) =>
+                    setReviewForm((prev) => ({
+                      ...prev,
+                      comment: e.target.value,
+                    }))
+                  }
+                  className="w-full p-2 border rounded-md"
+                  rows="4"
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={isSubmittingReview}
+                className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 disabled:opacity-50"
+              >
+                {isSubmittingReview ? "Submitting..." : "Submit Review"}
+              </button>
+            </form>
+          )}
+
+          {/* Reviews List */}
+          <div className="space-y-6">
+            {reviews.length > 0 ? (
+              reviews.map((review) => {
+                console.log("Individual Review:", review); // Debug individual review
+                return (
+                  <div key={review.reviewId} className="border-b pb-6">
+                    <div className="flex items-center mb-2">
+                      <div className="flex text-yellow-500">
+                        {[...Array(5)].map((_, i) => (
+                          <span
+                            key={i}
+                            className={
+                              i < review.rating
+                                ? "text-yellow-500"
+                                : "text-gray-300"
+                            }
+                          >
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                      <span className="ml-2 text-sm text-gray-500">
+                        {new Date(review.date).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <p className="text-gray-700">{review.comment}</p>
+                    <p className="text-sm text-gray-500 mt-2">
+                      By {currentUser?.userName || "Anonymous"}
+                    </p>
+                  </div>
+                );
+              })
+            ) : (
+              <p className="text-gray-500 text-center py-4">
+                No reviews yet. Be the first to review!
+              </p>
+            )}
           </div>
         </div>
       </main>

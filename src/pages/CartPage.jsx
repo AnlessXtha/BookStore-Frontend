@@ -120,6 +120,7 @@ export function CartPage() {
       const orderItems = cart.map((item) => ({
         bookId: item.bookId,
         quantity: item.quantity,
+        bookTitle: item.title,
       }));
 
       const response = await apiClient.post(
@@ -133,7 +134,6 @@ export function CartPage() {
       );
 
       if (response.data.success) {
-        alert(response.data.data); // sSow success message with bill and discounts
         setCart([]); // clear cart in frontend
         navigate("/myorders");
       } else {

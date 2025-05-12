@@ -8,6 +8,7 @@ import { createApiClient } from "../lib/createApiClient";
 import toast from "react-hot-toast";
 import { AuthContext } from "../context/AuthContext";
 import { Search } from "lucide-react";
+import { genreOptions } from "../constants/genreOptions";
 
 const BookCatalog = () => {
   const navigate = useNavigate();
@@ -215,11 +216,11 @@ const BookCatalog = () => {
               }}
               className="px-4 py-2 border rounded-md"
             >
-              <option value="">All Genres</option>
-              <option value="Magic">Magic</option>
-              <option value="Children's Fiction">Children's Fiction</option>
-              <option value="Astrology">Astrology</option>
-              <option value="Self-Help">Self-Help</option>
+              {genreOptions.map((genre) => (
+                <option key={genre.value} value={genre.value}>
+                  {genre.label}
+                </option>
+              ))}
             </select>
           </div>
         </form>

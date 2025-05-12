@@ -1,0 +1,17 @@
+export const genreOptions = [
+  { label: "All Genres", value: "" },
+  { label: "Magic", value: "Magic" },
+  { label: "Children's Fiction", value: "Children's Fiction" },
+  { label: "Astrology", value: "Astrology" },
+  { label: "Self-Help", value: "Self-Help" },
+  { label: "Science Fiction", value: "Science Fiction" },
+  { label: "Fantasy", value: "Fantasy" },
+  { label: "Biography", value: "Biography" },
+  { label: "Mystery", value: "Mystery" },
+  { label: "Romance", value: "Romance" },
+  { label: "Thriller", value: "Thriller" },
+  { label: "History", value: "History" },
+  { label: "Horror", value: "Horror" },
+  { label: "Poetry", value: "Poetry" },
+  { label: "Philosophy", value: "Philosophy" },
+];

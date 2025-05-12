@@ -1,4 +1,3 @@
-// App.jsx
 import React, { useContext } from "react";
 import {
   RouterProvider,
@@ -18,129 +17,75 @@ import BookCatalog from "./pages/BookCatalog";
 import AddBookForm from "./pages/AddBookForm";
 import EditBookForm from "./pages/EditBookForm";
 
-import MainLayout from "./components/MainLayout";
+import { MainLayout, RequireAuth } from "./components/MainLayout";
 import { AdminDashboard } from "./pages/Admin/AdminPanel";
 import { BooksPage } from "./pages/Admin/BooksManagement";
 import { UsersPage } from "./pages/Admin/UserManagement";
 import { StaffManagement } from "./pages/Admin/StaffManagement";
 
-import { AuthContext } from "./context/AuthContext";
 import { Toaster } from "react-hot-toast";
-import ProtectedRoute from "./components/ProtectedRoutes";
+import RedirectBasedOnRole from "./pages/RedirectBasedOnRole";
+import StaffDashboard from "./pages/Staff/StaffDashBoard";
+import UserOrderDetails from "./pages/Staff/UserOrderDetails";
+import UserProfile from "./pages/UserProfile";
+import { AuthContext } from "./context/AuthContext";
+
+const router = createBrowserRouter([
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/register",
+    element: <Register />,
+  },
+  {
+    path: "/",
+    element: <MainLayout />,
+    children: [
+      { index: true, element: <RedirectBasedOnRole /> },
+      { path: "home", element: <HomePage /> },
+      { path: "catalog", element: <BookCatalog /> },
+      { path: "bookdetails/:id", element: <BookDetails /> },
+
+      {
+        element: <RequireAuth allowedRoles={["Member"]} />,
+        children: [
+          { path: "cart", element: <CartPage /> },
+          { path: "whitelist", element: <Whitelist /> },
+          { path: "myorders", element: <OrdersPage /> },
+          { path: "orderdetails/:id", element: <OrderDetails /> },
+          { path: "user-profile", element: <UserProfile /> },
+        ],
+      },
+    ],
+  },
+
+  {
+    path: "/admin",
+    element: <RequireAuth allowedRoles={["Admin"]} />,
+    children: [
+      { path: "", element: <AdminDashboard /> },
+      { path: "books", element: <BooksPage /> },
+      { path: "users", element: <UsersPage /> },
+      { path: "staff", element: <StaffManagement /> },
+      { path: "add-book", element: <AddBookForm /> },
+      { path: "edit-book/:id", element: <EditBookForm /> },
+    ],
+  },
+
+  {
+    path: "/staff",
+    element: <RequireAuth allowedRoles={["Staff"]} />,
+    children: [
+      { path: "", element: <StaffDashboard /> },
+      { path: "users", element: <UsersPage /> },
+      { path: "user-order-details", element: <UserOrderDetails /> },
+    ],
+  },
+]);
 
 const App = () => {
-  const { currentUser } = useContext(AuthContext);
-  const isAdmin = currentUser?.roles?.includes("Admin");
-  const isMember = currentUser?.roles?.includes("Member");
-
-  const withAuth = (element, isAllowed, errorMessage) => (
-    <ProtectedRoute isAllowed={isAllowed} errorMessage={errorMessage}>
-      {element}
-    </ProtectedRoute>
-  );
-
-  const router = createBrowserRouter([
-    {
-      path: "/login",
-      element: <Login />,
-    },
-    {
-      path: "/register",
-      element: <Register />,
-    },
-    {
-      path: "/",
-      element: <MainLayout />,
-      children: [
-        { path: "", element: <HomePage /> },
-        { path: "catalog", element: <BookCatalog /> },
-        { path: "bookdetails/:id", element: <BookDetails /> },
-
-        {
-          path: "cart",
-          element: withAuth(
-            <CartPage />,
-            isMember,
-            "Login as a member to access your cart."
-          ),
-        },
-        {
-          path: "whitelist",
-          element: withAuth(
-            <Whitelist />,
-            isMember,
-            "Login as a member to access whitelist."
-          ),
-        },
-        {
-          path: "myorders",
-          element: withAuth(
-            <OrdersPage />,
-            isMember,
-            "Login as a member to view your orders."
-          ),
-        },
-        {
-          path: "orderdetails/:id",
-          element: withAuth(
-            <OrderDetails />,
-            isMember,
-            "Login as a member to view order details."
-          ),
-        },
-        // {
-        //   path: "addBook",
-        //   element: withAuth(
-        //     <AddBookForm />,
-        //     isMember,
-        //     "Only members can add books."
-        //   ),
-        // },
-        // {
-        //   path: "editBook/:id",
-        //   element: withAuth(
-        //     <EditBookForm />,
-        //     isMember,
-        //     "Only members can edit books."
-        //   ),
-        // },
-      ],
-    },
-    {
-      path: "/admin",
-      children: [
-        {
-          path: "",
-          element: withAuth(<AdminDashboard />, isAdmin, "Admin access only."),
-        },
-        {
-          path: "books",
-          element: withAuth(<BooksPage />, isAdmin, "Admin access only."),
-        },
-        {
-          path: "users",
-          element: withAuth(<UsersPage />, isAdmin, "Admin access only."),
-        },
-        {
-          path: "staff",
-          element: withAuth(<StaffManagement />, isAdmin, "Admin access only."),
-        },
-        {
-          path: "add-book",
-          element: withAuth(<AddBookForm />, isAdmin, "Admin access only."),
-        },
-        {
-          path: "edit-book/:id",
-          element: withAuth(<EditBookForm />, isAdmin, "Admin access only."),
-        },
-      ],
-    },
-    {
-      path: "*",
-      element: <Navigate to="/" replace />,
-    },
-  ]);
-
   return (
     <>
       <Toaster position="top-center" reverseOrder={false} />

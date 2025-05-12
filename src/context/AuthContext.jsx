@@ -25,7 +25,9 @@ export const AuthContextProvider = ({ children }) => {
       let updatedCart;
       if (existing) {
         updatedCart = prevCart.map((i) =>
-          i.bookId === item.bookId ? { ...i, quantity: i.quantity + item.quantity } : i
+          i.bookId === item.bookId
+            ? { ...i, quantity: i.quantity + item.quantity }
+            : i
         );
       } else {
         updatedCart = [...prevCart, item];
@@ -36,6 +38,14 @@ export const AuthContextProvider = ({ children }) => {
 
   const removeFromCart = (bookId) => {
     setCart((prevCart) => prevCart.filter((item) => item.bookId !== bookId));
+  };
+
+  const logout = () => {
+    setCurrentUser(null);
+    setCart([]);
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("cart");
   };
 
   useEffect(() => {
@@ -55,6 +65,7 @@ export const AuthContextProvider = ({ children }) => {
         updateCart,
         addToCart,
         removeFromCart,
+        logout,
       }}
     >
       {children}
