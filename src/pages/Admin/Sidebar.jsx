@@ -11,15 +11,12 @@ import {
     BookIcon
 } from 'lucide-react';
 
-const Sidebar = () => {
+export function Sidebar  () {
     const [collapsed, setCollapsed] = useState(false);
     const location = useLocation();
 
     const menuItems = [
-        { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/' },
         { name: 'Books', icon: <BookOpen size={20} />, path: '/admin/books' },
-        { name: 'Users', icon: <Users size={20} />, path: '/admin/users' },
-        { name: 'Staff', icon: <UserCog size={20} />, path: '/admin/staff' }
     ];
 
     const handleLogout = () => {

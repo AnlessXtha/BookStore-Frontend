@@ -1,8 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Search, Plus, Filter } from "lucide-react";
+import { Search, Plus, Filter, Edit, Trash2, SearchCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { createApiClient } from "../../lib/createApiClient";
+import { Sidebar } from '../Admin/Sidebar'
 import toast from "react-hot-toast";
 
 export function BooksPage() {
@@ -99,148 +100,161 @@ export function BooksPage() {
   };
 
   return (
-    <div className="p-6 space-y-6 animate-fadeIn">
-      <div className="flex flex-col md:flex-row justify-between gap-4">
-        <div className="relative">
+    <div className="px-4 md:px-24 space-y-10 max-w-7xl mx-auto">
+      <Sidebar />
+
+      {/* Header with title and button */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8 mt-6 mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Book Inventory</h1>
+        <button
+          className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors"
+          onClick={() => navigate('/admin/add-book')}
+        >
+          <Plus size={18} />
+          Add New Book
+        </button>
+      </div>
+
+      {/* Search and Filters */}
+      <div className="flex flex-col md:flex-row gap-4">
+        <div className="relative w-full">
           <input
             type="text"
-            placeholder="Search books..."
-            className="w-full md:w-80 pl-10 pr-4 py-2 border rounded-lg"
+            placeholder="Search by title or author..."
+            className="w-full pl-10 pr-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
+          <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
         </div>
 
-        <div className="flex gap-2">
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center gap-2 hover:bg-blue-700"
-            onClick={() => navigate('/admin/add-book')}>
-            <Plus size={20} />
-            Add Book
-          </button>
-          <button
-            className="px-4 py-2 border rounded-lg flex items-center gap-2 hover:bg-gray-50"
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            <Filter size={20} />
-            Filters
-          </button>
+        <button
+          className="px-4 py-2 border rounded-lg flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors"
+          onClick={() => setShowFilters(!showFilters)}
+        >
+          <Filter size={18} />
+          <span className="font-medium text-sm">Filters</span>
+        </button>
+      </div>
+
+      {/* Filter Chips */}
+      {showFilters && (
+        <div className="flex flex-wrap gap-2">
+          {filters.map((filter) => (
+            <button
+              key={filter.id}
+              className={`px-4 py-1.5 text-sm rounded-full font-medium ${activeFilter === filter.id
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                }`}
+              onClick={() => setActiveFilter(filter.id)}
+            >
+              {filter.name}
+            </button>
+          ))}
         </div>
-      </div>
+      )}
 
-      <div className="flex gap-2 overflow-x-auto pb-2">
-        {filters.map((filter) => (
-          <button
-            key={filter.id}
-            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap
-              ${activeFilter === filter.id
-                ? "bg-blue-600 text-white"
-                : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-              }`}
-            onClick={() => setActiveFilter(filter.id)}
-          >
-            {filter.name}
-          </button>
-        ))}
-      </div>
-
-      <div className="overflow-auto">
-        <table className="min-w-full table-auto border rounded-lg shadow-sm">
-          <thead>
-            <tr className="bg-gray-100 text-left text-sm font-semibold text-gray-700">
-              <th className="p-3">Cover</th>
-              <th className="p-3">Title</th>
-              <th className="p-3">Author</th>
-              <th className="p-3">Genre</th>
-              <th className="p-3">Price</th>
-              <th className="p-3">Stock</th>
-              <th className="p-3">Actions</th>
+      {/* Book Table */}
+      <div className="bg-white rounded-lg shadow overflow-x-auto">
+        <table className="min-w-full text-sm">
+          <thead className="bg-gray-50 text-gray-700">
+            <tr>
+              <th className="px-4 py-3 font-semibold">Cover</th>
+              <th className="px-4 py-3 font-semibold">Book Details</th>
+              <th className="px-4 py-3 font-semibold">Genre</th>
+              <th className="px-4 py-3 font-semibold">Price</th>
+              <th className="px-4 py-3 font-semibold">Stock</th>
+              <th className="px-4 py-3 font-semibold">Actions</th>
             </tr>
           </thead>
-          <tbody>
-            {filteredBooks?.map((book) => (
-              <tr key={book.bookId} className="border-b hover:bg-gray-50">
-                <td className="p-3">
-                  <img
-                    src={book.cover}
-                    alt={book.title}
-                    className="w-16 h-20 object-cover rounded"
-                  />
+          <tbody className="divide-y">
+            {filteredBooks.map((book) => (
+              <tr key={book.bookId} className="hover:bg-gray-50 transition">
+                <td className="px-4 py-3">
+                  <img src={book.cover} alt={book.title} className="w-14 h-20 object-cover rounded" />
                 </td>
-                <td className="p-3 font-medium">{book.title}</td>
-                <td className="p-3 text-gray-600">{book.author}</td>
-                <td className="p-3">
-                  <div className="flex flex-wrap gap-1">{book.genre}</div>
+                <td className="px-4 py-3">
+                  <div>
+                    <div className="font-medium text-gray-900">{book.title}</div>
+                    <div className="text-gray-600 text-sm">{book.author}</div>
+                  </div>
                 </td>
-                <td className="p-3 font-semibold">Rs. {book.price}</td>
-                <td className="p-3">
+                <td className="px-4 py-3 text-gray-700">{book.genre}</td>
+                <td className="px-4 py-3 font-medium">₹{book.price}</td>
+                <td className="px-4 py-3">
                   <span
-                    className={`px-2 py-1 rounded-full text-sm ${book.stock > 10
-                      ? "bg-green-100 text-green-800"
-                      : book.stock > 0
-                        ? "bg-yellow-100 text-yellow-800"
-                        : "bg-red-100 text-red-800"
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${book.stockQuantity > 10
+                        ? "bg-green-100 text-green-800"
+                        : book.stockQuantity > 0
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-red-100 text-red-800"
                       }`}
                   >
-                    {book.stock} in stock
+                    {book.stockQuantity > 0 ? `${book.stockQuantity} In stock` : "Out of stock"}
                   </span>
                 </td>
-                <td className="p-3 flex gap-2">
-                  <button
-                    onClick={() => {
-                      navigate(`/admin/edit-book/${book.bookId}`);
-                    }}
-                    className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteClick(book)}
-                    className="px-3 py-1 border border-red-600 text-red-600 text-sm rounded hover:bg-red-50"
-                  >
-                    Delete
-                  </button>
+                <td className="px-4 py-3">
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => navigate(`/admin/edit-book/${book.bookId}`)}
+                      className="p-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100"
+                      aria-label="Edit"
+                    >
+                      <Edit size={16} />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteClick(book)}
+                      className="p-1.5 bg-red-50 text-red-600 rounded hover:bg-red-100"
+                      aria-label="Delete"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
             {filteredBooks.length === 0 && (
               <tr>
-                <td colSpan="7" className="p-4 text-center text-gray-500">
-                  No books found.
+                <td colSpan="6" className="px-4 py-8 text-center text-gray-500">
+                  <div className="flex flex-col items-center">
+                    <SearchCheck size={24} className="text-gray-400 mb-2" />
+                    <p>No books found. Try adjusting your search.</p>
+                  </div>
                 </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
+
+      {/* Delete Modal */}
       {showDeleteDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.5)]">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-            <h2 className="text-lg font-semibold mb-3">Confirm Deletion</h2>
-            <p className="mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-4">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-sm p-6 animate-fadeIn">
+            <h2 className="text-lg font-semibold mb-2">Confirm Deletion</h2>
+            <p className="text-gray-600 mb-4">
               Are you sure you want to delete{" "}
-              <span className="font-bold text-red-600">
-                "{bookToDelete?.title}"
-              </span>
-              ?
+              <span className="font-semibold text-gray-900">"{bookToDelete?.title}"</span>? This cannot be undone.
             </p>
-            <div className="flex justify-end gap-3">
+            <div className="flex justify-end gap-2 mt-6">
               <button
                 onClick={cancelDelete}
-                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded"
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDelete}
-                className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded"
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded"
               >
-                Delete
+                Delete Book
               </button>
             </div>
           </div>
         </div>
       )}
     </div>
+
   );
 }

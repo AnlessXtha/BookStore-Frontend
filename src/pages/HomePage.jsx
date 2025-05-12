@@ -126,12 +126,9 @@ const HomePage = () => {
   };
 
   return (
-    <div className="bg-gray-50 text-gray-800 min-h-screen">
+    <div className="font-system bg-gray-50 text-gray-800 min-h-screen">
       {/* Notification Bar */}
-      <div className="bg-black text-white py-2 px-4 flex items-center justify-center gap-2">
-        <Bell size={16} className="text-yellow-400" />
-        < OrderNotifications />
-      </div>
+      < OrderNotifications />
 
       {/* Hero Section */}
       <div className="bg-gray-50 py-16 px-4">
@@ -153,21 +150,21 @@ const HomePage = () => {
           <div className="relative h-[300px] md:h-[400px] flex justify-center">
             <div className="absolute transform rotate-[-8deg] left-0 top-1/2 -translate-y-1/2 w-[140px] md:w-[180px] transition-all hover:z-10 hover:scale-105">
               <img
-                src="https://images.pexels.com/photos/4170629/pexels-photo-4170629.jpeg"
+                src="https://images.pexels.com/photos/2846814/pexels-photo-2846814.jpeg?auto=compress&cs=tinysrgb&w=800"
                 alt="When Women Ruled the World"
                 className="w-full h-auto rounded-lg shadow-lg"
               />
             </div>
             <div className="absolute z-[1] top-1/2 -translate-y-1/2 w-[140px] md:w-[180px] transition-all hover:z-10 hover:scale-105">
               <img
-                src="https://images.pexels.com/photos/5834/nature-grass-leaf-green.jpg"
+                src="https://images.pexels.com/photos/159866/books-book-pages-read-literature-159866.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                 alt="Twice the Speed of Dark"
                 className="w-full h-auto rounded-lg shadow-lg"
               />
             </div>
             <div className="absolute transform rotate-[8deg] right-0 top-1/2 -translate-y-1/2 w-[140px] md:w-[180px] transition-all hover:z-10 hover:scale-105">
               <img
-                src="https://images.pexels.com/photos/5834/nature-grass-leaf-green.jpg"
+                src="https://images.pexels.com/photos/4170629/pexels-photo-4170629.jpeg"
                 alt="1984"
                 className="w-full h-auto rounded-lg shadow-lg"
               />
@@ -248,15 +245,13 @@ const HomePage = () => {
               <ul className="space-y-2">
                 <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Home</a></li>
                 <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Catalog</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">New Releases</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Bestsellers</a></li>
               </ul>
             </div>
             <div>
               <h3 className="text-xl font-bold mb-4">Contact Us</h3>
-              <p className="text-gray-400 mb-2">Email: info@cover2cover.com</p>
-              <p className="text-gray-400 mb-2">Phone: +1 (555) 123-4567</p>
-              <p className="text-gray-400">Address: 123 Book Street, Reading City</p>
+              <p className="text-gray-400 mb-2">Email:  bookstore1043@gmail.com</p>
+              <p className="text-gray-400 mb-2">Phone: +977 1234567</p>
+              <p className="text-gray-400">Address: Sanchal Sanepa, Lalipur</p>
             </div>
           </div>
           <div className="border-t border-gray-800 pt-6 text-center text-gray-500">

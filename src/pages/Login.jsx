@@ -64,7 +64,7 @@ function Login() {
         await fetchCartItems();
         navigate("/");
       } else if (user.roles.includes("Admin")) {
-        navigate("/admin");
+        navigate("/admin/books");
       } else {
         navigate("/staff/users");
       }

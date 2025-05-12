@@ -8,15 +8,12 @@ import { Whitelist } from "./pages/Whitelist";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import MainLayout from "./components/MainLayout";
-import { AdminDashboard } from "./pages/Admin/AdminPanel";
 import { BooksPage } from "./pages/Admin/BooksManagement";
 import { UsersPage } from "./pages/Admin/UserManagement";
-import { StaffManagement } from "./pages/Admin/StaffManagement";
 import { AddBookForm } from "./pages/Admin/AddBookForm";
 import BookCatalog from "./pages/BookCatalog";
 import OrdersPage from "./pages/MyOrders";
 import BookDetails from "./pages/BookDetails";
-import StaffDashboard from "./pages/Staff/StaffDashboard";
 import OrderDetails from "./pages/Staff/UserOrderDetails";
 import { AuthContext } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoutes";
@@ -86,7 +83,7 @@ function App() {
             "Login as a member to view your orders."
           ),
         },
-         {
+        {
           path: "notifications",
           element: withAuth(
             <OrderNotifications />,
@@ -124,16 +121,8 @@ function App() {
       path: "/admin",
       children: [
         {
-          path: "",
-          element: withAuth(<AdminDashboard />, isAdmin, "Admin access only."),
-        },
-        {
           path: "books",
           element: withAuth(<BooksPage />, isAdmin, "Admin access only."),
-        },
-        {
-          path: "staff",
-          element: withAuth(<StaffManagement />, isAdmin, "Admin access only."),
         },
         {
           path: "add-book",
@@ -148,10 +137,6 @@ function App() {
     {
       path: "/staff",
       children: [
-        {
-          path: "",
-          element: withAuth(<StaffDashboard />, isStaff, "Staff access only."),
-        },
         {
           path: "users",
           element: withAuth(<UsersPage />, isStaff, "Staff access only."),

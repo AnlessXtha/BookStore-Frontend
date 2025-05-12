@@ -15,7 +15,7 @@ function OrderNotifications() {
       setNotifications(prev => [{
         ...notification,
         id: Date.now() // Add unique id for React keys
-      }, ...prev].slice(0, 5)); // Keep only last 5 notifications
+      }, ...prev].slice(0, 5)); 
     });
 
     connection.start()
