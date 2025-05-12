@@ -48,7 +48,7 @@ export function BooksPage() {
           )}&pageNumber=${page}&pageSize=${pageSize}`
         : `/api/Books?pageNumber=${page}&pageSize=${pageSize}`;
 
-      const response = await apiClient.get(endpoint);
+      const response = await apiClient.get("/api/Books/");
       setBooks(response.data.items || response.data);
       setTotalPages(response.data.totalPages || 1);
     } catch (err) {
@@ -175,7 +175,7 @@ export function BooksPage() {
                   <tr key={book.bookId} className="border-b hover:bg-gray-50">
                     <td className="p-3">
                       <img
-                        src={book.cover}
+                        src={`https://localhost:7086${book.imagePath} `}
                         alt={book.title}
                         className="w-16 h-20 object-cover rounded"
                       />

@@ -330,7 +330,7 @@ const AddBookForm = () => {
             <label className="block mb-1 font-semibold text-gray-700">
               Upload Book Cover
             </label>
-            <div className="border border-dashed h-156 w-auto border-gray-400 rounded-md p-4 flex flex-col items-center">
+            <div className="border border-dashed h-156 w-auto border-gray-400 rounded-md p-4 flex flex-col items-center justify-center">
               {preview ? (
                 <img
                   src={preview}
