@@ -1,33 +1,40 @@
 import React, { useContext } from "react";
 import {
-  RouterProvider,
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
   createBrowserRouter,
   Navigate,
+  RouterProvider,
 } from "react-router-dom";
-
 import HomePage from "./pages/HomePage";
+import { CartPage } from "./pages/CartPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import { Whitelist } from "./pages/Whitelist";
-import { CartPage } from "./pages/CartPage";
-import OrdersPage from "./pages/MyOrders";
-import OrderDetails from "./pages/OrderDetails";
-import BookDetails from "./pages/BookDetails";
-import BookCatalog from "./pages/BookCatalog";
-import AddBookForm from "./pages/Admin/AddBookForm";
-import EditBookForm from "./pages/Admin/EditBookForm";
-
+import { Toaster } from "react-hot-toast";
+import Navbar from "./components/Navbar";
 import { MainLayout, RequireAuth } from "./components/MainLayout";
 import { BooksPage } from "./pages/Admin/BooksManagement";
 import { UsersPage } from "./pages/Admin/UserManagement";
-import { StaffManagement } from "./pages/Admin/StaffManagement";
+import { MembersPage } from "./pages/Staff/MembersManagement";
 
-import { Toaster } from "react-hot-toast";
-import RedirectBasedOnRole from "./pages/RedirectBasedOnRole";
-import StaffDashboard from "./pages/Staff/StaffDashBoard";
-import UserOrderDetails from "./pages/Staff/UserOrderDetails";
-import UserProfile from "./pages/UserProfile";
+import AddBookForm from "./pages/Admin/AddBookForm";
+import BookCatalog from "./pages/BookCatalog";
+import OrdersPage from "./pages/MyOrders";
+import BookDetails from "./pages/BookDetails";
+import OrderDetails from "./pages/Staff/UserOrderDetails";
 import { AuthContext } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoutes";
+import EditBookForm from "./pages/Admin/EditBookForm";
+import UserProfile from "./pages/UserProfile";
+import OrderNotifications from "./pages/OrderNotifications";
+import RedirectBasedOnRole from "./pages/RedirectBasedOnRole";
+import BannerManagement from "./pages/Admin/BannerManagement";
+import ActiveBannerAnnouncements from "./pages/ActiveBannerAnnouncements";
+import DiscountManagement from "./pages/Admin/DiscountManagment";
+// import CataloguePage from "./pages/CataloguePage"; // Create this page too
 
 const router = createBrowserRouter([
   {
@@ -54,6 +61,10 @@ const router = createBrowserRouter([
           { path: "whitelist", element: <Whitelist /> },
           { path: "myorders", element: <OrdersPage /> },
           { path: "orderdetails/:id", element: <OrderDetails /> },
+          {
+            path: "active-banner-announcements",
+            element: <ActiveBannerAnnouncements />,
+          },
           { path: "user-profile", element: <UserProfile /> },
         ],
       },
@@ -66,7 +77,8 @@ const router = createBrowserRouter([
     children: [
       { path: "", element: <BooksPage /> },
       { path: "users", element: <UsersPage /> },
-      { path: "staff", element: <StaffManagement /> },
+      { path: "announcements", element: <BannerManagement /> },
+      { path: "discount-management", element: <DiscountManagement /> },
       { path: "add-book", element: <AddBookForm /> },
       { path: "edit-book/:id", element: <EditBookForm /> },
     ],
@@ -76,9 +88,8 @@ const router = createBrowserRouter([
     path: "/staff",
     element: <RequireAuth allowedRoles={["Staff"]} />,
     children: [
-      { path: "", element: <StaffDashboard /> },
-      { path: "users", element: <UsersPage /> },
-      { path: "user-order-details", element: <UserOrderDetails /> },
+      { path: "", element: <MembersPage /> },
+      { path: "user-order-details", element: <OrderDetails /> },
     ],
   },
 ]);

@@ -92,10 +92,13 @@ export function Whitelist() {
 
   const filterBooks = (books) => {
     if (filterAvailable === "available") {
-      return books.filter((book) => book.isAvailable);
+      return books.filter((book) => book.stockQuantity > 0);
     }
     if (filterAvailable === "unavailable") {
-      return books.filter((book) => !book.isAvailable);
+      return books.filter((book) => book.stockQuantity == 0);
+    }
+    if (filterAvailable === "store") {
+      return books.filter((book) => book.isStoreOnlyAccess);
     }
     return books;
   };
@@ -129,21 +132,6 @@ export function Whitelist() {
           <div className="flex flex-wrap gap-6">
             <div className="w-48">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Sort by
-              </label>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="block w-full pl-3 pr-10 py-2 text-sm border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-              >
-                <option value="dateAdded">Date Added</option>
-                <option value="title">Title</option>
-                <option value="price">Price</option>
-              </select>
-            </div>
-
-            <div className="w-48">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Availability
               </label>
               <select
@@ -153,6 +141,7 @@ export function Whitelist() {
               >
                 <option value="all">All</option>
                 <option value="available">Available</option>
+                <option value="store">Store Only</option>
                 <option value="unavailable">Unavailable</option>
               </select>
             </div>
@@ -201,22 +190,46 @@ export function Whitelist() {
                 </p>
 
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-base font-semibold text-gray-900">
-                    Rs {book?.price?.toFixed(2)}
-                  </span>
+                  {/* Price display logic */}
+                  <div>
+                    {book.activeDiscount ? (
+                      <div>
+                        <p className="text-sm text-gray-500 line-through">
+                          Rs {book.price.toFixed(2)}
+                        </p>
+                        <p className="text-base font-semibold text-blue-600">
+                          Rs {book.activeDiscount.discountedPrice.toFixed(2)}
+                        </p>
+                      </div>
+                    ) : (
+                      <span className="text-base font-semibold text-gray-900">
+                        Rs {book.price.toFixed(2)}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Availability status */}
                   <span
                     className={`flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${
-                      book.isAvailable
+                      book.isStoreOnlyAccess
+                        ? "bg-green-100 text-green-700"
+                        : book.stockQuantity > 0
                         ? "bg-green-100 text-green-700"
                         : "bg-red-100 text-red-700"
                     }`}
                   >
-                    {book.isAvailable ? (
+                    {book.isStoreOnlyAccess ? (
+                      <Check className="h-4 w-4" />
+                    ) : book.stockQuantity > 0 ? (
                       <Check className="h-4 w-4" />
                     ) : (
                       <X className="h-4 w-4" />
                     )}
-                    {book.isAvailable ? "Available" : "Out of Stock"}
+                    {book.isStoreOnlyAccess
+                      ? "Store Only Access"
+                      : book.stockQuantity > 0
+                      ? "Available"
+                      : "Out of Stock"}
                   </span>
                 </div>
 

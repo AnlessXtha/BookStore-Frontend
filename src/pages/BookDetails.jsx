@@ -42,7 +42,7 @@ const BookDetails = () => {
           checkPurchaseStatus();
         }
       } catch (err) {
-        setError("Failed to load book details.");
+        setError("Failed to load bookData details.");
       } finally {
         setLoading(false);
       }
@@ -64,21 +64,35 @@ const BookDetails = () => {
     }
   };
 
+  const [averageRating, setAverageRating] = useState(0);
+  const [ratingCount, setRatingCount] = useState(0);
+
   const fetchReviews = async () => {
     try {
       const response = await apiClient.get(`/api/Review/Get-Book/${id}`);
-      console.log("Full Review Response:", response); // Debug full response
-      console.log("Review Data:", response.data); // Debug data specifically
       if (response.data.success) {
         const reviewsData = response.data.data || [];
-        console.log("Reviews Array:", reviewsData); // Debug reviews array
         setReviews(reviewsData);
+
+        if (reviewsData.length > 0) {
+          const total = reviewsData.reduce((sum, r) => sum + r.rating, 0);
+          const avg = total / reviewsData.length;
+          setAverageRating(avg);
+          setRatingCount(reviewsData.length);
+        } else {
+          setAverageRating(0);
+          setRatingCount(0);
+        }
       } else {
         setReviews([]);
+        setAverageRating(0);
+        setRatingCount(0);
       }
     } catch (error) {
       console.error("Failed to fetch reviews:", error);
       setReviews([]);
+      setAverageRating(0);
+      setRatingCount(0);
     }
   };
 
@@ -91,7 +105,7 @@ const BookDetails = () => {
     }
 
     if (!hasPurchased) {
-      toast.error("You must purchase this book to leave a review.");
+      toast.error("You must purchase this bookData to leave a review.");
       return;
     }
 
@@ -179,39 +193,19 @@ const BookDetails = () => {
     const hasHalfStar = rating - fullStars >= 0.5;
     const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
-    return (
-      <div className="flex">
-        {[...Array(fullStars)].map((_, i) => (
-          <svg
-            key={i}
-            className="w-5 h-5 text-yellow-500"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path d="M9.049 2.927c.3-.921 1.603-.921..." />
-          </svg>
-        ))}
-        {hasHalfStar && (
-          <svg
-            className="w-5 h-5 text-yellow-500"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path d="M9.049 2.927c.3-.921 1.603-.921..." />
-          </svg>
-        )}
-        {[...Array(emptyStars)].map((_, i) => (
-          <svg
-            key={i}
-            className="w-5 h-5 text-gray-300"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path d="M9.049 2.927c.3-.921 1.603-.921..." />
-          </svg>
-        ))}
-      </div>
-    );
+    const stars = [];
+
+    for (let i = 0; i < fullStars; i++) {
+      stars.push(<span key={`full-${i}`}>★</span>);
+    }
+    if (hasHalfStar) {
+      stars.push(<span key="half">☆</span>);
+    }
+    for (let i = 0; i < emptyStars; i++) {
+      stars.push(<span key={`empty-${i}`}>☆</span>);
+    }
+
+    return <div className="text-yellow-500">{stars}</div>;
   };
 
   if (loading) return <div className="text-center py-10">Loading...</div>;
@@ -225,7 +219,7 @@ const BookDetails = () => {
           <div className="md:w-1/3">
             <img
               src={`https://localhost:7086${bookData.imagePath} `}
-              alt={`${bookData.title} book cover`}
+              alt={`${bookData.title} bookData cover`}
               className="w-full shadow-lg"
             />
           </div>
@@ -233,13 +227,33 @@ const BookDetails = () => {
           <div className="md:w-2/3 bg-white p-8 shadow">
             <h1 className="text-5xl font-bold mb-2">{bookData.title}</h1>
             <p className="text-2xl mb-4">by {bookData.author}</p>
-            <p className="text-xl font-semibold mb-2">Rs. {bookData.price}</p>
+
+            <p className="text-md mb-4">{bookData.description}</p>
+
+            {!bookData.activeDiscount ? (
+              <p className="text-xl font-semibold mb-2">Rs. {bookData.price}</p>
+            ) : (
+              <div className="mb-3">
+                <p className="text-xl text-gray-500 line-through">
+                  Rs. {bookData.price}
+                </p>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-xl text-red-600 font-semibold">
+                    Rs. {bookData.activeDiscount.discountedPrice}
+                  </span>
+                  <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded">
+                    -{bookData.activeDiscount.discountPercent}%
+                  </span>
+                </div>
+              </div>
+            )}
 
             <div className="flex items-center mb-4">
-              {renderStars(bookData.ratings?.average || 0)}
+              {renderStars(averageRating)}
               <span className="ml-2 text-gray-600">
-                {bookData.ratings?.average || 0}/5 (
-                {bookData.ratings?.count || 0} ratings)
+                {averageRating.toFixed(1)}/5 ({ratingCount} rating
+                {ratingCount !== 1 ? "s" : ""})
               </span>
             </div>
 
@@ -296,7 +310,11 @@ const BookDetails = () => {
                 className={`px-6 py-2 bg-black text-white font-medium ${
                   isAddedToCart || !bookData.isAvailable ? "opacity-75" : ""
                 }`}
-                disabled={!bookData.isAvailable || isAddedToCart}
+                disabled={
+                  bookData.stockQuantity === 0 ||
+                  bookData.isStoreOnlyAccess ||
+                  isAddedToCart
+                }
               >
                 {!bookData.isAvailable
                   ? "Out of Stock"

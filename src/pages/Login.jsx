@@ -56,21 +56,16 @@ function Login() {
       );
       console.log("Login successful:", response.data);
 
-      if (response.data.user?.roles.includes("Member")) {
-        updateUser(response.data?.user);
-        await localStorage.setItem("token", response.data.token);
+      const { user, token } = response.data;
+      await localStorage.setItem("token", token);
+      updateUser(user);
+
+      if (user.roles.includes("Member")) {
         await fetchCartItems();
-
         navigate("/");
-      } else if (response.data.user?.roles.includes("Admin")) {
-        updateUser(response.data?.user);
-        await localStorage.setItem("token", response.data.token);
-
+      } else if (user.roles.includes("Admin")) {
         navigate("/admin");
-      } else if (response.data.user?.roles.includes("Staff")) {
-        updateUser(response.data?.user);
-        await localStorage.setItem("token", response.data.token);
-
+      } else {
         navigate("/staff");
       }
     } catch (error) {

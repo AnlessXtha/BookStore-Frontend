@@ -51,7 +51,7 @@ export function BooksPage() {
       const response = await apiClient.get(
         "/api/Books?pageNumber=1&pageSize=10000"
       );
-      setBooks(response.data.items || response.data);
+      setBooks(response.data.data || response.data);
       setTotalPages(response.data.totalPages || 1);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to fetch books.");

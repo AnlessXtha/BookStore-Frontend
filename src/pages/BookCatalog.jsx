@@ -576,9 +576,25 @@ const BookCatalog = () => {
                         Stock: {book.stockQuantity}
                       </p>
                     )}
-                    <p className="font-bold mb-3 text-blue-600">
-                      Rs. {book.price}
-                    </p>
+                    {!book.activeDiscount ? (
+                      <p className="font-bold mb-3 text-blue-600">
+                        Rs. {book.price}
+                      </p>
+                    ) : (
+                      <div className="mb-3">
+                        <p className="text-sm text-gray-500 line-through">
+                          Rs. {book.price}
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <span className="text-red-600 font-semibold">
+                            Rs. {book.activeDiscount.discountedPrice}
+                          </span>
+                          <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded">
+                            -{book.activeDiscount.discountPercent}%
+                          </span>
+                        </div>
+                      </div>
+                    )}
                     <div className="px-4 pb-4 flex justify-between gap-2">
                       {!book.isStoreOnlyAccess ? (
                         <button
