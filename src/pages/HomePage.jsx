@@ -4,10 +4,85 @@ import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { createApiClient } from "../lib/createApiClient";
 import toast from "react-hot-toast";
+import axios from "axios";
+
+const API_BASE_URL = 'https://localhost:7086';
 
 const HomePage = () => {
+  const [banners, setBanners] = useState([]);
+  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+
+  useEffect(() => {
+    fetchActiveBanners();
+  }, []);
+
+  const fetchActiveBanners = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/Banner/all`);
+      const activeBanners = response.data.filter(banner => {
+        const now = new Date();
+        const startDate = new Date(banner.startDate);
+        const endDate = new Date(banner.endDate);
+        return banner.isActive && now >= startDate && now <= endDate;
+      });
+      setBanners(activeBanners);
+    } catch (error) {
+      console.error('Failed to fetch banners:', error);
+    }
+  };
+
+  // Auto-rotate banners every 5 seconds
+  useEffect(() => {
+    if (banners.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentBannerIndex((prevIndex) => 
+          prevIndex === banners.length - 1 ? 0 : prevIndex + 1
+        );
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [banners.length]);
+
   return (
     <div className="bg-gray-50 text-gray-800">
+      {/* Banner Section */}
+      {banners.length > 0 && (
+        <div className="relative w-full h-[400px] overflow-hidden">
+          {banners.map((banner, index) => (
+            <div
+              key={banner.bannerId}
+              className={`absolute w-full h-full transition-opacity duration-500 ${
+                index === currentBannerIndex ? 'opacity-100' : 'opacity-0'
+              }`}
+            >
+              <img
+                src={banner.imageUrl}
+                alt={banner.title}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-6">
+                <h2 className="text-2xl font-bold mb-2">{banner.title}</h2>
+                <p className="text-lg">{banner.description}</p>
+              </div>
+            </div>
+          ))}
+          {/* Banner Navigation Dots */}
+          {banners.length > 1 && (
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+              {banners.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentBannerIndex(index)}
+                  className={`w-3 h-3 rounded-full ${
+                    index === currentBannerIndex ? 'bg-white' : 'bg-white/50'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-12">
         <h2 className="text-3xl font-semibold mb-6">Featured Books</h2>

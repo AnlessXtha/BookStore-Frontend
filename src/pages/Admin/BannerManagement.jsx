@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Calendar } from 'lucide-react';
+import { Plus, Edit, Trash2, Calendar, Upload } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+
+// Add API base URL
+const API_BASE_URL = 'https://localhost:7086';
 
 const BannerManagement = () => {
     const [banners, setBanners] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingBanner, setEditingBanner] = useState(null);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [previewUrl, setPreviewUrl] = useState('');
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -17,36 +22,109 @@ const BannerManagement = () => {
     });
 
     useEffect(() => {
-        fetchBanners();
+        const token = localStorage.getItem('token');
+        console.log('Token:', token); // Debugging
+        if (!token) {
+            toast.error('Please login to access this feature');
+            window.location.href = '/login';
+        } else {
+            fetchBanners();
+        }
     }, []);
 
     const fetchBanners = async () => {
         try {
-            const response = await axios.get('/api/Banner/all');
-            setBanners(response.data);
+            const token = localStorage.getItem('token');
+            if (!token) {
+                toast.error('Please login to access this feature');
+                window.location.href = '/login'; // Redirect to login page
+                return;
+            }
+
+            const response = await axios.get(`${API_BASE_URL}/api/Banner/all`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            setBanners(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
-            toast.error('Failed to fetch banners');
+            console.error('Error fetching banners:', error.response?.data || error.message);
+            if (error.response?.status === 401) {
+                toast.error('Session expired. Please log in again.');
+                window.location.href = '/login'; // Redirect to login page
+            } else {
+                toast.error('Failed to fetch banners');
+            }
+            setBanners([]);
+        }
+    };
+
+    const handleFileSelect = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            setSelectedFile(file);
+            // Create a preview URL for the selected image
+            const fileReader = new FileReader();
+            fileReader.onload = (e) => {
+                setPreviewUrl(e.target.result);
+                setFormData(prev => ({ ...prev, imageUrl: e.target.result }));
+            };
+            fileReader.readAsDataURL(file);
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                toast.error('Please login to access this feature');
+                window.location.href = '/login'; // Redirect to login page
+                return;
+            }
+    
+            // Format dates to match API expectations
+            const formattedData = {
+                ...formData,
+                startDate: new Date(formData.startDate).toISOString(),
+                endDate: new Date(formData.endDate).toISOString(),
+                title: formData.title?.trim(),
+                description: formData.description?.trim(),
+                imageUrl: formData.imageUrl?.trim(),
+                isActive: formData.isActive ?? true
+            };
+    
+            const headers = {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
+    
             if (editingBanner) {
-                await axios.put(`/api/Banner/${editingBanner.bannerId}`, formData);
+                await axios.put(`${API_BASE_URL}/api/Banner/${editingBanner.bannerId}`, formattedData, { headers });
                 toast.success('Banner updated successfully');
             } else {
-                await axios.post('/api/Banner', formData);
+                await axios.post(`${API_BASE_URL}/api/Banner`, formattedData, { headers });
                 toast.success('Banner created successfully');
             }
+    
             setIsModalOpen(false);
             setEditingBanner(null);
+            setSelectedFile(null);
+            setPreviewUrl('');
             resetForm();
             fetchBanners();
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Operation failed');
+            console.error('Error details:', error.response?.data || error.message);
+            if (error.response?.status === 401) {
+                toast.error('Session expired. Please log in again.');
+                window.location.href = '/login'; // Redirect to login page
+            } else {
+                toast.error(error.response?.data?.message || 'Operation failed');
+            }
         }
     };
+    
 
     const handleEdit = (banner) => {
         setEditingBanner(banner);
@@ -58,17 +136,34 @@ const BannerManagement = () => {
             endDate: new Date(banner.endDate).toISOString().split('T')[0],
             isActive: banner.isActive
         });
+        setPreviewUrl(banner.imageUrl);
         setIsModalOpen(true);
     };
 
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this banner?')) {
             try {
-                await axios.delete(`/api/Banner/${id}`);
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    toast.error('Please login to access this feature');
+                    return;
+                }
+
+                await axios.delete(`${API_BASE_URL}/api/Banner/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 toast.success('Banner deleted successfully');
                 fetchBanners();
             } catch (error) {
-                toast.error('Failed to delete banner');
+                console.error('Error deleting banner:', error.response?.data || error.message);
+                if (error.response?.status === 401) {
+                    toast.error('Session expired. Please log in again.');
+                    window.location.href = '/login';
+                } else {
+                    toast.error('Failed to delete banner');
+                }
             }
         }
     };
@@ -82,6 +177,8 @@ const BannerManagement = () => {
             endDate: '',
             isActive: true
         });
+        setSelectedFile(null);
+        setPreviewUrl('');
     };
 
     return (
@@ -188,14 +285,33 @@ const BannerManagement = () => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">Image URL</label>
-                                <input
-                                    type="url"
-                                    value={formData.imageUrl}
-                                    onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                    required
-                                />
+                                <label className="block text-sm font-medium text-gray-700">Banner Image</label>
+                                <div className="mt-1 flex items-center space-x-4">
+                                    <label className="cursor-pointer bg-white px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                        <Upload className="h-5 w-5 inline-block mr-2" />
+                                        Choose Image
+                                        <input
+                                            type="file"
+                                            className="hidden"
+                                            accept="image/*"
+                                            onChange={handleFileSelect}
+                                        />
+                                    </label>
+                                    {selectedFile && (
+                                        <span className="text-sm text-gray-500">
+                                            {selectedFile.name}
+                                        </span>
+                                    )}
+                                </div>
+                                {previewUrl && (
+                                    <div className="mt-2">
+                                        <img
+                                            src={previewUrl}
+                                            alt="Preview"
+                                            className="h-32 w-auto object-contain rounded-lg"
+                                        />
+                                    </div>
+                                )}
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
@@ -259,4 +375,4 @@ const BannerManagement = () => {
     );
 };
 
-export default BannerManagement; 
+export default BannerManagement;
