@@ -1,11 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { createApiClient } from "../../lib/createApiClient";
-
 import { genreOptions } from "../../constants/genreOptions";
 import Sidebar from "./Sidebar";
 
-const AddBookForm = () => {
+
+const EditBookForm = () => {
+  const navigate = useNavigate();
+
+  const { id } = useParams();
+  const apiClient = createApiClient("https://localhost:7086");
+
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const [form, setForm] = useState({
@@ -27,7 +33,41 @@ const AddBookForm = () => {
 
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
-  const [response, setResponse] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBook = async () => {
+      try {
+        const res = await apiClient.get(`/api/Books/${id}`);
+        const book = res.data;
+        setForm({
+          title: book.title,
+          description: book.description,
+          author: book.author,
+          genre: book.genre,
+          language: book.language,
+          publisher: book.publisher,
+          format: book.format,
+          isbn: book.isbn,
+          stockQuantity: book.stockQuantity,
+          price: book.price,
+          isAvailable: book.isAvailable,
+          isStoreOnlyAccess: false,
+          publicationDate: book.publicationDate?.split("T")[0] || "",
+          arrivalDate: book.arrivalDate?.split("T")[0] || "",
+        });
+        if (book.imagePath) {
+          setPreview(`https://localhost:7086${book.imagePath}`);
+        }
+      } catch (err) {
+        toast.error("Failed to load book.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBook();
+  }, [id]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -43,21 +83,10 @@ const AddBookForm = () => {
     setPreview(URL.createObjectURL(file));
   };
 
-  const apiClient = createApiClient("https://localhost:7086");
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const formData = new FormData();
-    // Object.keys(form).forEach((key) => {
-    //   if (key === "publicationDate") {
-    //     const datetime = new Date(`${form[key]}T00:00:00`);
-    //     formData.append(key, datetime.toISOString());
-    //   } else {
-    //     formData.append(key, form[key]);
-    //   }
-    // });
-
     Object.keys(form).forEach((key) => {
       if (key === "publicationDate" || key === "arrivalDate") {
         formData.append(key, `${form[key]}T00:00:00Z`);
@@ -69,37 +98,28 @@ const AddBookForm = () => {
     if (image) formData.append("image", image);
 
     try {
-      const res = await apiClient.post("/api/books", formData, {
+      await apiClient.put(`/api/Books/${id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      setResponse("Book added successfully!");
-      toast.success("Book added successfully!");
-
-      setForm({
-        title: "",
-        author: "",
-        description: "",
-        genre: "",
-        language: "",
-        publisher: "",
-        format: "",
-        isbn: "",
-        stockQuantity: 0,
-        price: 0,
-        isAvailable: true,
-        publicationDate: "",
-        arrivalDate: "",
-        isStoreOnlyAccess: false,
-      });
-      setImage(null);
-      setPreview(null);
-      console.log(res.data);
+      toast.success("Book updated successfully!");
+      navigate("/admin");
     } catch (err) {
       console.error(err);
-      setResponse("Failed to add book.");
-      toast.error("Failed to add book.");
+      toast.error("Failed to update book.");
     }
   };
+
+  const handleCancel = () => {
+    navigate("/admin");
+  };
+
+  if (loading) {
+    return (
+      <p className="text-center mt-8 text-lg text-gray-700">
+        Loading book details...
+      </p>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -112,7 +132,7 @@ const AddBookForm = () => {
       >
         <div className="w-[1200px] h-auto mx-auto p-6 border rounded-lg shadow-md bg-white mt-6 mb-6">
           <h2 className="text-2xl font-bold mb-6 text-center text-blue-800">
-            Add New Book
+            Update Book
           </h2>
           <form
             onSubmit={handleSubmit}
@@ -185,7 +205,6 @@ const AddBookForm = () => {
                       ))}
                   </select>
                 </div>
-
                 <div>
                   <label className="block mb-1 font-semibold text-gray-700">
                     Language
@@ -339,7 +358,7 @@ const AddBookForm = () => {
               <label className="block mb-1 font-semibold text-gray-700">
                 Upload Book Cover
               </label>
-              <div className="border border-dashed h-156 w-auto border-gray-400 rounded-md p-4 flex flex-col items-center justify-center">
+              <div className="border border-dashed h-156 w-auto border-gray-400 rounded-md p-4 flex flex-col items-center">
                 {preview ? (
                   <img
                     src={preview}
@@ -360,25 +379,27 @@ const AddBookForm = () => {
 
             {/* Submit Button */}
           </form>
-          <button
-            type="submit"
-            className="w-full mt-12 bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded"
-            onClick={handleSubmit}
-            disabled={!form.title || !form.author || !form.genre || !image}
-          >
-            Submit
-          </button>
-
-          {/* {response && (
-          <p className="mt-4 text-center text-lg font-medium text-gray-700">
-            {response}
-          </p>
-        )} */}
+          <div className="flex justify-between gap-4 mt-12">
+            <button
+              type="button"
+              className="w-full bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded"
+              onClick={handleCancel}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded"
+              onClick={handleSubmit}
+              // disabled={!form.title || !form.author || !form.genre || !image}
+            >
+              Update
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default AddBookForm;
-
+export default EditBookForm;

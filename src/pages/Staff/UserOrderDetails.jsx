@@ -222,7 +222,7 @@ function OrderDetails() {
                                                                 <table className="min-w-full divide-y divide-gray-200">
                                                                     <thead>
                                                                         <tr className="text-xs text-gray-500 uppercase">
-                                                                            <th className="px-4 py-2 text-left">Book ID</th>
+                                                                            <th className="px-4 py-2 text-left">Book Title</th>
                                                                             <th className="px-4 py-2 text-left">Quantity</th>
                                                                             <th className="px-4 py-2 text-left">Price</th>
                                                                             <th className="px-4 py-2 text-left">Subtotal</th>
@@ -231,7 +231,7 @@ function OrderDetails() {
                                                                     <tbody>
                                                                         {order.orderItems.map((item, index) => (
                                                                             <tr key={index} className="text-sm">
-                                                                                <td className="px-4 py-2">{item.bookId}</td>
+                                                                                <td className="px-4 py-2">{item.bookTitle}</td>
                                                                                 <td className="px-4 py-2">{item.quantity}</td>
                                                                                 <td className="px-4 py-2">Rs {item.price.toFixed(2)}</td>
                                                                                 <td className="px-4 py-2">Rs {(item.price * item.quantity).toFixed(2)}</td>

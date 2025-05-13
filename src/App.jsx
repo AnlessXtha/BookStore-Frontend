@@ -7,156 +7,82 @@ import Register from './pages/Register';
 import { Whitelist } from "./pages/Whitelist";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
-import MainLayout from "./components/MainLayout";
+import { MainLayout, RequireAuth } from "./components/MainLayout";
 import { BooksPage } from "./pages/Admin/BooksManagement";
 import { UsersPage } from "./pages/Admin/UserManagement";
-import { AddBookForm } from "./pages/Admin/AddBookForm";
+import { MembersPage } from "./pages/Staff/MembersManagement";
+import AddBookForm from "./pages/Admin/AddBookForm";
 import BookCatalog from "./pages/BookCatalog";
 import OrdersPage from "./pages/MyOrders";
 import BookDetails from "./pages/BookDetails";
 import OrderDetails from "./pages/Staff/UserOrderDetails";
 import { AuthContext } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoutes";
-import EditBookForm from "./pages/EditBookForm";
+import EditBookForm from "./pages/Admin/EditBookForm";
 import UserProfile from "./pages/UserProfile";
 import OrderNotifications from "./pages/OrderNotifications";
+import RedirectBasedOnRole from "./pages/RedirectBasedOnRole";
 // import CataloguePage from "./pages/CataloguePage"; // Create this page too
 
-function App() {
-  const { currentUser } = useContext(AuthContext);
-  const isAdmin = currentUser?.roles?.includes("Admin");
-  const isMember = currentUser?.roles?.includes("Member");
-  const isStaff = currentUser?.roles?.includes("Staff");
+const router = createBrowserRouter([
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/register",
+    element: <Register />,
+  },
+  {
+    path: "/",
+    element: <MainLayout />,
+    children: [
+      { index: true, element: <RedirectBasedOnRole /> },
+      { path: "home", element: <HomePage /> },
+      { path: "catalog", element: <BookCatalog /> },
+      { path: "bookdetails/:id", element: <BookDetails /> },
 
-  const withAuth = (element, isAllowed, errorMessage) => (
-    <ProtectedRoute isAllowed={isAllowed} errorMessage={errorMessage}>
-      {element}
-    </ProtectedRoute>
-  );
+      {
+        element: <RequireAuth allowedRoles={["Member"]} />,
+        children: [
+          { path: "cart", element: <CartPage /> },
+          { path: "whitelist", element: <Whitelist /> },
+          { path: "myorders", element: <OrdersPage /> },
+          { path: "orderdetails/:id", element: <OrderDetails /> },
+          { path: "user-profile", element: <UserProfile /> },
+        ],
+      },
+    ],
+  },
 
-  const router = createBrowserRouter([
-    {
-      path: "/login",
-      element: <Login />,
-    },
-    {
-      path: "/register",
-      element: <Register />,
-    },
-    {
-      path: "/",
-      element: <MainLayout />,
-      children: [
-        { path: "", element: <HomePage /> },
-        { path: "catalog", element: <BookCatalog /> },
-        { path: "bookdetails/:id", element: <BookDetails /> },
+  {
+    path: "/admin",
+    element: <RequireAuth allowedRoles={["Admin"]} />,
+    children: [
+      { path: "", element: <BooksPage /> },
+      { path: "users", element: <UsersPage /> },
+      { path: "add-book", element: <AddBookForm /> },
+      { path: "edit-book/:id", element: <EditBookForm /> },
+    ],
+  },
 
-        {
-          path: "cart",
-          element: withAuth(
-            <CartPage />,
-            isMember,
-            "Login as a member to access your cart."
-          ),
-        },
-        {
-          path: "whitelist",
-          element: withAuth(
-            <Whitelist />,
-            isMember,
-            "Login as a member to access whitelist."
-          ),
-        },
-        {
-          path: "user-profile",
-          element: withAuth(
-            <UserProfile user={currentUser} />,
-            isMember,
-            "Login as a member to access profile."
-          ),
-        },
-        {
-          path: "myorders",
-          element: withAuth(
-            <OrdersPage />,
-            isMember,
-            "Login as a member to view your orders."
-          ),
-        },
-        {
-          path: "notifications",
-          element: withAuth(
-            <OrderNotifications />,
-            isMember,
-            "Login as a member to view your notifications."
-          ),
-        },
-        {
-          path: "orderdetails/:id",
-          element: withAuth(
-            <OrderDetails />,
-            isMember,
-            "Login as a member to view order details."
-          ),
-        },
-        // {
-        //   path: "addBook",
-        //   element: withAuth(
-        //     <AddBookForm />,
-        //     isMember,
-        //     "Only members can add books."
-        //   ),
-        // },
-        // {
-        //   path: "editBook/:id",
-        //   element: withAuth(
-        //     <EditBookForm />,
-        //     isMember,
-        //     "Only members can edit books."
-        //   ),
-        // },
-      ],
-    },
-    {
-      path: "/admin",
-      children: [
-        {
-          path: "books",
-          element: withAuth(<BooksPage />, isAdmin, "Admin access only."),
-        },
-        {
-          path: "add-book",
-          element: withAuth(<AddBookForm />, isAdmin, "Admin access only."),
-        },
-        {
-          path: "edit-book/:id",
-          element: withAuth(<EditBookForm />, isAdmin, "Admin access only."),
-        },
-      ],
-    },
-    {
-      path: "/staff",
-      children: [
-        {
-          path: "users",
-          element: withAuth(<UsersPage />, isStaff, "Staff access only."),
-        },
-        {
-          path: "user-order-details",
-          element: withAuth(<OrderDetails />, isStaff, "Staff access only."),
-        },]
-    },
-    {
-      path: "*",
-      element: <Navigate to="/" replace />,
-    },
-  ]);
+  {
+    path: "/staff",
+    element: <RequireAuth allowedRoles={["Staff"]} />,
+    children: [
+      { path: "", element: <MembersPage /> },
+      { path: "user-order-details", element: <OrderDetails /> },
+    ],
+  },
+]);
+
+const App = () => {
   return (
     <>
       <Toaster position="top-center" reverseOrder={false} />
       <RouterProvider router={router} />
     </>
   );
-}
+};
 
 export default App;

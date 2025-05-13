@@ -1,7 +1,9 @@
-import React from 'react';
-import { User, Mail, Phone, Car as IdCard, Star } from 'lucide-react';
+import React, { useContext } from "react";
+import { User, Mail, Phone, Car as IdCard, Star } from "lucide-react";
+import { AuthContext } from "../context/AuthContext";
 
-const UserProfile = ({ user }) => {
+const UserProfile = () => {
+  const { currentUser } = useContext(AuthContext);
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
@@ -13,9 +15,11 @@ const UserProfile = ({ user }) => {
             </div>
           </div>
           <h1 className="text-2xl font-bold text-center">
-            {user.firstName} {user.lastName}
+            {currentUser.firstName} {currentUser.lastName}
           </h1>
-          <p className="text-blue-100 text-center mt-1">@{user.userName}</p>
+          <p className="text-blue-100 text-center mt-1">
+            @{currentUser.userName}
+          </p>
         </div>
 
         {/* Profile Information */}
@@ -28,7 +32,7 @@ const UserProfile = ({ user }) => {
               </div>
               <div>
                 <p className="text-sm text-gray-500">Email</p>
-                <p className="text-gray-800">{user.email}</p>
+                <p className="text-gray-800">{currentUser.email}</p>
               </div>
             </div>
 
@@ -39,7 +43,7 @@ const UserProfile = ({ user }) => {
               </div>
               <div>
                 <p className="text-sm text-gray-500">Contact Number</p>
-                <p className="text-gray-800">{user.contactNumber}</p>
+                <p className="text-gray-800">{currentUser.contactNumber}</p>
               </div>
             </div>
 
@@ -51,7 +55,7 @@ const UserProfile = ({ user }) => {
               <div>
                 <p className="text-sm text-gray-500">Membership ID</p>
                 <p className="text-gray-800">
-                  {user.membershipId || 'Not assigned'}
+                  {currentUser.membershipId || "Not assigned"}
                 </p>
               </div>
             </div>
@@ -63,7 +67,7 @@ const UserProfile = ({ user }) => {
               </div>
               <div>
                 <p className="text-sm text-gray-500">Role</p>
-                <p className="text-gray-800">{user.roles.join(', ')}</p>
+                <p className="text-gray-800">{currentUser.roles.join(", ")}</p>
               </div>
             </div>
           </div>

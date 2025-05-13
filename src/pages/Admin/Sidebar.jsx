@@ -11,12 +11,13 @@ import {
     BookIcon
 } from 'lucide-react';
 
-export function Sidebar  () {
+export function Sidebar() {
     const [collapsed, setCollapsed] = useState(false);
     const location = useLocation();
 
     const menuItems = [
-        { name: 'Books', icon: <BookOpen size={20} />, path: '/admin/books' },
+        { name: 'Users', icon: <UserCog size={20} />, path: '/admin/users' },
+        { name: 'Books', icon: <BookOpen size={20} />, path: '/admin' },
     ];
 
     const handleLogout = () => {
@@ -46,8 +47,8 @@ export function Sidebar  () {
                             <Link
                                 to={item.path}
                                 className={`flex items-center gap-3 px-4 py-3 transition-all duration-200 ${location.pathname === item.path
-                                        ? 'bg-blue-800 text-white border-l-4 border-amber-400'
-                                        : 'text-blue-100 hover:bg-blue-800 hover:text-white'
+                                    ? 'bg-blue-800 text-white border-l-4 border-amber-400'
+                                    : 'text-blue-100 hover:bg-blue-800 hover:text-white'
                                     }`}
                             >
                                 {item.icon}
@@ -60,7 +61,7 @@ export function Sidebar  () {
 
             <div className="absolute bottom-0 w-full border-t border-blue-800">
                 <button className="flex items-center gap-3 px-4 py-4 w-full text-blue-100 hover:bg-blue-800 hover:text-white transition-colors"
-                onClick={handleLogout}>
+                    onClick={handleLogout}>
                     <LogOut size={20} />
                     {!collapsed && <span>Log Out</span>}
                 </button>

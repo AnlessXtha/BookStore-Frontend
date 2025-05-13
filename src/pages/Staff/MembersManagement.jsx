@@ -2,10 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Badge, BookOpen, Calendar, Mail, Phone, Search, User, User2, UserPlus, Users } from 'lucide-react';
 import { createApiClient } from '../../lib/createApiClient';
 import { useNavigate } from 'react-router-dom';
-import { StaffSidebar } from '../Staff/StaffSidebar';
-import Sidebar from './Sidebar';
+import { StaffSidebar } from './StaffSidebar';
 
-export function UsersPage() {
+export function MembersPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
@@ -23,8 +22,12 @@ export function UsersPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      // Filtering users with empty membershipId
+      const filteredUsers = (response.data || []).filter(
+        user => user.membershipId && user.membershipId.trim() !== ""
+      );
 
-      setUsers(response.data || []);
+      setUsers(filteredUsers);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch users.");
     } finally {
@@ -55,16 +58,16 @@ export function UsersPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row">
-      <Sidebar />
+      <StaffSidebar />
       <div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
               <Users className="h-8 w-8 text-blue-600" />
-              User Management
+              Registered Users (Members) Management
             </h1>
             <p className="mt-2 text-sm text-gray-600">
-              Manage all users and view their details
+              Manage members and view their order history
             </p>
           </div>
 
@@ -111,6 +114,9 @@ export function UsersPage() {
                       Contact
                     </div>
                   </th>
+                  <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 bg-white">
@@ -146,6 +152,15 @@ export function UsersPage() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="text-sm text-gray-900">{user.contactNumber}</div>
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <button
+                          onClick={() => viewOrderDetails(user.id, user.userName)}
+                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                        >
+                          <BookOpen className="h-4 w-4 mr-2" />
+                          View Orders
+                        </button>
                       </td>
                     </tr>
                   ))}

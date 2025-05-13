@@ -64,9 +64,9 @@ function Login() {
         await fetchCartItems();
         navigate("/");
       } else if (user.roles.includes("Admin")) {
-        navigate("/admin/books");
+        navigate("/admin");
       } else {
-        navigate("/staff/users");
+        navigate("/staff");
       }
 
     } catch (error) {

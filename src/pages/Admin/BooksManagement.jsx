@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Search, Plus, Filter, Edit, Trash2, SearchCheck } from "lucide-react";
+import { Search, Plus, Filter, Edit, Trash2, SearchCheck, Book, BookAudio, BookOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { createApiClient } from "../../lib/createApiClient";
@@ -105,7 +105,7 @@ export function BooksPage() {
 
       {/* Header with title and button */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8 mt-6 mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Book Inventory</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-800"><BookOpen /> Book Inventory</h1>
         <button
           className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors"
           onClick={() => navigate('/admin/add-book')}
@@ -144,8 +144,8 @@ export function BooksPage() {
             <button
               key={filter.id}
               className={`px-4 py-1.5 text-sm rounded-full font-medium ${activeFilter === filter.id
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 text-gray-800 hover:bg-gray-200"
                 }`}
               onClick={() => setActiveFilter(filter.id)}
             >
@@ -181,14 +181,14 @@ export function BooksPage() {
                   </div>
                 </td>
                 <td className="px-4 py-3 text-gray-700">{book.genre}</td>
-                <td className="px-4 py-3 font-medium">₹{book.price}</td>
+                <td className="px-4 py-3 font-medium">Rs. {book.price}</td>
                 <td className="px-4 py-3">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${book.stockQuantity > 10
-                        ? "bg-green-100 text-green-800"
-                        : book.stockQuantity > 0
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-red-100 text-red-800"
+                      ? "bg-green-100 text-green-800"
+                      : book.stockQuantity > 0
+                        ? "bg-yellow-100 text-yellow-800"
+                        : "bg-red-100 text-red-800"
                       }`}
                   >
                     {book.stockQuantity > 0 ? `${book.stockQuantity} In stock` : "Out of stock"}

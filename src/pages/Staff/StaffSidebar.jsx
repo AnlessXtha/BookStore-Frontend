@@ -16,7 +16,7 @@ export function StaffSidebar() {
     const location = useLocation();
 
     const menuItems = [
-        { name: 'Users', icon: <Users size={20} />, path: '/staff/users' },
+        { name: 'Users', icon: <Users size={20} />, path: '/staff' },
     ];
 
     const handleLogout = () => {
