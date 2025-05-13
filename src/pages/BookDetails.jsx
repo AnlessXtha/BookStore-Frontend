@@ -36,7 +36,7 @@ const BookDetails = () => {
     const fetchBookDetails = async () => {
       try {
         const response = await apiClient.get(`/api/Books/${id}`);
-        setBookData(response.data);
+        setBookData(response.data.data);
         fetchReviews();
         if (currentUser) {
           checkPurchaseStatus();

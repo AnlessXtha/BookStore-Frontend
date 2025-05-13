@@ -22,6 +22,8 @@ const HomePage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
+  console.log(books, "djasdibasd");
+
   // Cart and wishlist state
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
@@ -45,7 +47,7 @@ const HomePage = () => {
         : `/api/Books?pageNumber=${page}&pageSize=${pageSize}`;
 
       const response = await apiClient.get(endpoint);
-      setBooks(response.data.items || response.data);
+      setBooks(response.data.data || response.data);
       setTotalPages(response.data.totalPages || 1);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch books.");

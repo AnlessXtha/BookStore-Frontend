@@ -48,7 +48,9 @@ export function BooksPage() {
           )}&pageNumber=${page}&pageSize=${pageSize}`
         : `/api/Books?pageNumber=${page}&pageSize=${pageSize}`;
 
-      const response = await apiClient.get("/api/Books/");
+      const response = await apiClient.get(
+        "/api/Books?pageNumber=1&pageSize=10000"
+      );
       setBooks(response.data.items || response.data);
       setTotalPages(response.data.totalPages || 1);
     } catch (err) {

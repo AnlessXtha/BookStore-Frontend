@@ -1,6 +1,12 @@
 import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Trash2, ShoppingBag, ShoppingCart, User } from "lucide-react";
+import {
+  Trash2,
+  ShoppingBag,
+  ShoppingCart,
+  User,
+  ImageIcon,
+} from "lucide-react";
 import { createApiClient } from "../lib/createApiClient";
 import { AuthContext } from "../context/AuthContext";
 
@@ -8,6 +14,8 @@ export function CartPage() {
   const { currentUser, updateCart } = useContext(AuthContext);
 
   const token = localStorage.getItem("token");
+
+  const [imageError, setImageError] = useState(false);
 
   const [cart, setCart] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -172,12 +180,19 @@ export function CartPage() {
           <ul className="border-t border-b border-gray-200 divide-y divide-gray-200">
             {cart?.map((item) => (
               <li key={item.bookId} className="flex py-6 sm:py-10">
-                <div className="flex-shrink-0">
-                  <img
-                    src={item.coverImage}
-                    alt={item.title}
-                    className="w-24 h-24 object-cover object-center rounded-md"
-                  />
+                <div className="flex-shrink-0 w-24 h-24">
+                  {imageError || !item.imagePath ? (
+                    <div className="w-24 h-24 flex items-center justify-center bg-gray-100 rounded-md">
+                      <ImageIcon className="w-8 h-8 text-gray-400" />
+                    </div>
+                  ) : (
+                    <img
+                      src={`https://localhost:7086${item.imagePath}`}
+                      alt={item.title}
+                      className="w-24 h-24 object-cover object-center rounded-md"
+                      onError={() => setImageError(true)}
+                    />
+                  )}
                 </div>
 
                 <div className="ml-4 flex-1 flex flex-col justify-between sm:ml-6">
@@ -197,7 +212,7 @@ export function CartPage() {
                         <p className="text-gray-500">{item.author}</p>
                       </div>
                       <p className="mt-1 text-sm font-medium text-gray-900">
-                        {item.price}
+                        Rs. {item.price}
                       </p>
                     </div>
 
@@ -245,7 +260,9 @@ export function CartPage() {
             <div className="mt-6 space-y-4">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-gray-600">Subtotal</p>
-                <p className="text-sm font-medium text-gray-900">{subtotal}</p>
+                <p className="text-sm font-medium text-gray-900">
+                  Rs. {subtotal}
+                </p>
               </div>
               {discount > 0 && (
                 <div className="flex items-center justify-between">
@@ -261,7 +278,9 @@ export function CartPage() {
                 <p className="text-base font-medium text-gray-900">
                   Order total
                 </p>
-                <p className="text-base font-medium text-gray-900">{total}</p>
+                <p className="text-base font-medium text-gray-900">
+                  Rs. {total}
+                </p>
               </div>
             </div>
 

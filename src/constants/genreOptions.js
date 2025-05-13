@@ -24,19 +24,18 @@ export const availabilityOptions = [
 
 export const languageOptions = [
   { label: "All", value: "" },
-  { label: "English", value: "en" },
-  { label: "Spanish", value: "es" },
-  { label: "Nepali", value: "nep" },
+  { label: "English", value: "English" },
+  { label: "Nepali", value: "Nepali" },
 ];
 
 export const formatOptions = [
   { label: "All", value: "" },
-  { label: "Paperback", value: "paperback" },
-  { label: "Hardcover", value: "hardcover" },
-  { label: "Signed", value: "signed" },
+  { label: "Paperback", value: "Paperback" },
+  { label: "Hardcover", value: "Hardcover" },
+  { label: "Signed", value: "Signed" },
   { label: "Limited", value: "limited" },
-  { label: "First Edition", value: "first" },
-  { label: "Collector's", value: "collector" },
-  { label: "Author's", value: "author" },
-  { label: "Deluxe", value: "deluxe" },
+  { label: "First Edition", value: "First Edition" },
+  { label: "Collector's", value: "Collector's" },
+  { label: "Author's", value: "Author's" },
+  { label: "Deluxe", value: "Deluxe" },
 ];

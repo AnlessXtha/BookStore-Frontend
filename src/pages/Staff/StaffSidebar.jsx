@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useContext, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   BookOpen,
   Users,
@@ -10,8 +10,12 @@ import {
   LogOut,
   BookIcon,
 } from "lucide-react";
+import { AuthContext } from "../../context/AuthContext";
 
 export function StaffSidebar() {
+  const navigate = useNavigate();
+  const { logout } = useContext(AuthContext);
+
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
 
@@ -21,8 +25,8 @@ export function StaffSidebar() {
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.href = "/login";
+    logout();
+    navigate("/login");
   };
 
   return (
