@@ -18,7 +18,6 @@ import AddBookForm from "./pages/AddBookForm";
 import EditBookForm from "./pages/EditBookForm";
 
 import { MainLayout, RequireAuth } from "./components/MainLayout";
-import { AdminDashboard } from "./pages/Admin/AdminPanel";
 import { BooksPage } from "./pages/Admin/BooksManagement";
 import { UsersPage } from "./pages/Admin/UserManagement";
 import { StaffManagement } from "./pages/Admin/StaffManagement";
@@ -65,8 +64,7 @@ const router = createBrowserRouter([
     path: "/admin",
     element: <RequireAuth allowedRoles={["Admin"]} />,
     children: [
-      { path: "", element: <AdminDashboard /> },
-      { path: "books", element: <BooksPage /> },
+      { path: "", element: <BooksPage /> },
       { path: "users", element: <UsersPage /> },
       { path: "staff", element: <StaffManagement /> },
       { path: "add-book", element: <AddBookForm /> },

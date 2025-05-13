@@ -19,8 +19,7 @@ const Sidebar = ({ collapsed, onCollapse }) => {
   const { logout } = useContext(AuthContext);
 
   const menuItems = [
-    { name: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/admin" },
-    { name: "Books", icon: <BookOpen size={20} />, path: "/admin/books" },
+    { name: "Books", icon: <BookOpen size={20} />, path: "/admin" },
     { name: "Users", icon: <Users size={20} />, path: "/admin/users" },
     { name: "Staff", icon: <UserCog size={20} />, path: "/admin/staff" },
   ];

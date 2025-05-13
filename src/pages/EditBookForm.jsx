@@ -102,7 +102,7 @@ const EditBookForm = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
       toast.success("Book updated successfully!");
-      navigate("/admin/books");
+      navigate("/admin");
     } catch (err) {
       console.error(err);
       toast.error("Failed to update book.");
@@ -110,7 +110,7 @@ const EditBookForm = () => {
   };
 
   const handleCancel = () => {
-    navigate("/admin/books");
+    navigate("/admin");
   };
 
   if (loading) {
