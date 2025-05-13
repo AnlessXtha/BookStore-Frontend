@@ -24,6 +24,7 @@ import OrderNotifications from "./pages/OrderNotifications";
 import RedirectBasedOnRole from "./pages/RedirectBasedOnRole";
 import BannerManagement from "./pages/Admin/BannerManagaement";
 import ActiveBannerAnnouncements from "./pages/ActiveBannerAnnouncements";
+import DiscountManagement from "./pages/Admin/DiscountManagement";
 // import CataloguePage from "./pages/CataloguePage"; // Create this page too
 
 const router = createBrowserRouter([
@@ -65,6 +66,7 @@ const router = createBrowserRouter([
       { path: "", element: <BooksPage /> },
       { path: "users", element: <UsersPage /> },
       { path: "announcements", element: <BannerManagement /> },
+      { path: "discount-management", element: <DiscountManagement /> },
       { path: "add-book", element: <AddBookForm /> },
       { path: "edit-book/:id", element: <EditBookForm /> },
     ],

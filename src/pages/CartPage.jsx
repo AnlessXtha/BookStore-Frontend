@@ -109,14 +109,14 @@ export function CartPage() {
   };
 
   const subtotal = Array.isArray(cart)
-    ? cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    ? cart.reduce((sum, item) => sum + item.finalPrice * item.quantity, 0)
     : 0;
   const discount = cart.length >= 5 ? subtotal * 0.05 : 0;
   const total = subtotal - discount;
 
   const checkout = async () => {
     try {
-      const token = localStorage.getItem("token"); 
+      const token = localStorage.getItem("token");
       const orderItems = cart.map((item) => ({
         bookId: item.bookId,
         quantity: item.quantity,
@@ -191,7 +191,10 @@ export function CartPage() {
                             </Link>
                             <p className="mt-1 text-sm text-gray-500">{item.author}</p>
                             <p className="mt-2 text-lg font-semibold text-gray-900">
-                              Rs. {item.price.toLocaleString()}
+                              Rs. {item.originalPrice.toLocaleString()}
+                            </p>
+                            <p className="mt-2 text-lg font-semibold text-gray-900">
+                              Rs. {item.finalPrice.toLocaleString()}
                             </p>
                           </div>
                           <button
@@ -239,7 +242,7 @@ export function CartPage() {
                 <div className="space-y-4">
                   <div className="border-t border-gray-200 pt-4 flex items-center justify-between">
                     <p className="text-lg font-semibold text-gray-900">Total</p>
-                    <p className="text-lg font-semibold text-gray-900">{total}</p>
+                    <p className="text-lg font-semibold text-gray-900">Rs. {total}</p>
                   </div>
                 </div>
 
