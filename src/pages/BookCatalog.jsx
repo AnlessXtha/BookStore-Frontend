@@ -8,7 +8,12 @@ import { createApiClient } from "../lib/createApiClient";
 import toast from "react-hot-toast";
 import { AuthContext } from "../context/AuthContext";
 import { Search } from "lucide-react";
-import { genreOptions } from "../constants/genreOptions";
+import {
+  availabilityOptions,
+  formatOptions,
+  genreOptions,
+  languageOptions,
+} from "../constants/genreOptions";
 
 const BookCatalog = () => {
   const navigate = useNavigate();
@@ -81,7 +86,14 @@ const BookCatalog = () => {
   const [books, setBooks] = useState([]);
 
   const [searchQuery, setSearchQuery] = useState("");
+
   const [genreFilter, setGenreFilter] = useState("");
+  const [authorFilter, setAuthorFilter] = useState("");
+  const [availabilityFilter, setAvailabilityFilter] = useState("");
+  const [languageFilter, setLanguageFilter] = useState("");
+  const [formatFilter, setFormatFilter] = useState("");
+  const [priceRange, setPriceRange] = useState({ min: "", max: "" });
+
   const [sortBy, setSortBy] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -167,61 +179,162 @@ const BookCatalog = () => {
       <div className="max-w-7xl mx-auto p-4">
         <h1 className="text-3xl font-bold mb-4 text-center">Book Catalog</h1>
 
-        <form
-          onSubmit={handleSearch}
-          className="flex justify-between items-center mb-8"
-        >
-          <div className="relative flex-1 max-w-2xl mx-auto">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="What do you want to read?"
-              className="w-full px-4 py-2 border rounded-md pr-10"
-            />
-            <button
-              type="submit"
-              className="absolute right-2 top-1/2 transform -translate-y-1/2"
-            >
-              <Search className="text-gray-500" />
-            </button>
-          </div>
+        <form onSubmit={handleSearch} className="mb-8 space-y-4">
+          <div className="flex flex-wrap justify-between items-center gap-4">
+            <div className="relative flex-1 max-w-2xl">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="What do you want to read?"
+                className="w-full px-4 py-2 border rounded-md pr-10"
+              />
+              <button
+                type="submit"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2"
+              >
+                <Search className="text-gray-500" />
+              </button>
+            </div>
 
-          <div className="ml-4">
-            <select
-              value={sortBy}
-              onChange={(e) => {
-                const selectedSort = e.target.value;
-                setSortBy(selectedSort);
-                setCurrentPage(1);
-                fetchBooks(searchQuery, 1, genreFilter, selectedSort);
-              }}
-              className="px-4 py-2 border rounded-md"
-            >
-              <option value="">Sort By:</option>
-              <option value="price_asc">Price: Low to High</option>
-              <option value="price_desc">Price: High to Low</option>
-              <option value="">Newest First</option>
-            </select>
-          </div>
-
-          <div className="ml-4">
-            <select
-              value={genreFilter}
-              onChange={(e) => {
-                const selectedGenre = e.target.value;
-                setGenreFilter(selectedGenre);
-                setCurrentPage(1);
-                fetchBooks(searchQuery, 1, selectedGenre, sortBy);
-              }}
-              className="px-4 py-2 border rounded-md"
-            >
-              {genreOptions.map((genre) => (
-                <option key={genre.value} value={genre.value}>
-                  {genre.label}
+            <div className="min-w-[200px]">
+              <select
+                value={sortBy}
+                onChange={(e) => {
+                  const selectedSort = e.target.value;
+                  setSortBy(selectedSort);
+                  setCurrentPage(1);
+                  fetchBooks(searchQuery, 1, genreFilter, selectedSort);
+                }}
+                className="w-full px-4 py-2 border rounded-md"
+              >
+                <option value="">Sort By:</option>
+                <option value="price_asc">Price: Low to High</option>
+                <option value="price_desc">Price: High to Low</option>
+                <option value="pub_date_asc">
+                  Publication Date: Old to New
                 </option>
-              ))}
-            </select>
+                <option value="pub_date_desc">
+                  Publication Date: New to Old
+                </option>
+                <option value="">New Arrival</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-4 justify-between">
+            <div className="flex-1 min-w-[150px] max-w-[200px]">
+              <label className="block mb-2 font-medium text-gray-700">
+                Genre
+              </label>
+              <select
+                value={genreFilter}
+                onChange={(e) => {
+                  const selectedGenre = e.target.value;
+                  setGenreFilter(selectedGenre);
+                  setCurrentPage(1);
+                  fetchBooks(searchQuery, 1, selectedGenre, sortBy);
+                }}
+                className="w-full px-4 py-2 border rounded-md"
+              >
+                {genreOptions.map((genre) => (
+                  <option key={genre.value} value={genre.value}>
+                    {genre.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex-1 min-w-[150px] max-w-[200px]">
+              <label className="block mb-2 font-medium text-gray-700">
+                Author
+              </label>
+              <input
+                type="text"
+                placeholder="Author"
+                value={authorFilter}
+                onChange={(e) => setAuthorFilter(e.target.value)}
+                className="w-full px-4 py-2 border rounded-md"
+              />
+            </div>
+
+            <div className="flex-1 min-w-[150px] max-w-[200px]">
+              <label className="block mb-2 font-medium text-gray-700">
+                Availability
+              </label>
+              <select
+                value={availabilityFilter}
+                onChange={(e) => setAvailabilityFilter(e.target.value)}
+                className="w-full px-4 py-2 border rounded-md"
+              >
+                {availabilityOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex-1 min-w-[150px] max-w-[200px]">
+              <label className="block mb-2 font-medium text-gray-700">
+                Language
+              </label>
+              <select
+                value={languageFilter}
+                onChange={(e) => setLanguageFilter(e.target.value)}
+                className="w-full px-4 py-2 border rounded-md"
+              >
+                {languageOptions.map((lang) => (
+                  <option key={lang.value} value={lang.value}>
+                    {lang.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex-1 min-w-[150px] max-w-[200px]">
+              <label className="block mb-2 font-medium text-gray-700">
+                Format
+              </label>
+              <select
+                value={formatFilter}
+                onChange={(e) => setFormatFilter(e.target.value)}
+                className="w-full px-4 py-2 border rounded-md"
+              >
+                {formatOptions.map((format) => (
+                  <option key={format.value} value={format.value}>
+                    {format.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex-1 min-w-[150px] max-w-[200px]">
+              <label className="block mb-2 font-medium text-gray-700">
+                Price Range
+              </label>
+              <div className="flex gap-2 items-center">
+                <input
+                  type="number"
+                  placeholder="Min"
+                  value={priceRange.min}
+                  onChange={(e) =>
+                    setPriceRange({ ...priceRange, min: e.target.value })
+                  }
+                  className="w-full px-2 py-1 border rounded-md"
+                />
+                <span>-</span>
+                <input
+                  type="number"
+                  placeholder="Max"
+                  value={priceRange.max}
+                  onChange={(e) =>
+                    setPriceRange({ ...priceRange, max: e.target.value })
+                  }
+                  className="w-full px-2 py-1 border rounded-md"
+                />
+              </div>
+            </div>
           </div>
         </form>
 

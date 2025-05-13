@@ -62,7 +62,7 @@ export function UsersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row">
       <StaffSidebar />
       <div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
