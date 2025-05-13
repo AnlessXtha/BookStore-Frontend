@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { createApiClient } from "../../lib/createApiClient";
 import toast from "react-hot-toast";
 import Sidebar from "./Sidebar";
-import { genreOptions } from "../../constants/genreOptions";
+import {
+  formatOptions,
+  genreOptions,
+  languageOptions,
+} from "../../constants/genreOptions";
 
 const AddBookForm = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -43,8 +47,11 @@ const AddBookForm = () => {
   };
 
   const apiClient = createApiClient("https://localhost:7086");
+  const token = localStorage.getItem("token");
 
   const handleSubmit = async (e) => {
+    console.log("form", form);
+
     e.preventDefault();
 
     const formData = new FormData();
@@ -69,7 +76,10 @@ const AddBookForm = () => {
 
     try {
       const res = await apiClient.post("/api/books", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
       });
       setResponse("Book added successfully!");
       toast.success("Book added successfully!");
@@ -162,7 +172,6 @@ const AddBookForm = () => {
                 />
               </div>
 
-              {/* Row 2: Genre & Language */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block mb-1 font-semibold text-gray-700">
@@ -175,6 +184,7 @@ const AddBookForm = () => {
                     required
                     className="w-full p-2 border border-gray-300 rounded"
                   >
+                    <option value=""></option>
                     {genreOptions
                       .filter((option) => option.value !== "")
                       .map((option) => (
@@ -189,18 +199,26 @@ const AddBookForm = () => {
                   <label className="block mb-1 font-semibold text-gray-700">
                     Language
                   </label>
-                  <input
+
+                  <select
                     name="language"
-                    type="text"
                     value={form.language}
                     onChange={handleChange}
                     required
                     className="w-full p-2 border border-gray-300 rounded"
-                  />
+                  >
+                    <option value=""></option>
+                    {languageOptions
+                      .filter((option) => option.value !== "")
+                      .map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                  </select>
                 </div>
               </div>
 
-              {/* Row 3: Publisher & Format */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block mb-1 font-semibold text-gray-700">
@@ -220,18 +238,26 @@ const AddBookForm = () => {
                   <label className="block mb-1 font-semibold text-gray-700">
                     Format
                   </label>
-                  <input
+
+                  <select
                     name="format"
-                    type="text"
                     value={form.format}
                     onChange={handleChange}
                     required
                     className="w-full p-2 border border-gray-300 rounded"
-                  />
+                  >
+                    <option value=""></option>
+                    {formatOptions
+                      .filter((option) => option.value !== "")
+                      .map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                  </select>
                 </div>
               </div>
 
-              {/* Row 4: ISBN (alone) */}
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
                   ISBN
@@ -246,7 +272,6 @@ const AddBookForm = () => {
                 />
               </div>
 
-              {/* Row 5: Stock & Price */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block mb-1 font-semibold text-gray-700">
@@ -277,7 +302,6 @@ const AddBookForm = () => {
                 </div>
               </div>
 
-              {/* Publication Date & Availability */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block mb-1 font-semibold text-gray-700">
@@ -363,7 +387,7 @@ const AddBookForm = () => {
             type="submit"
             className="w-full mt-12 bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded"
             onClick={handleSubmit}
-            disabled={!form.title || !form.author || !form.genre || !image}
+            // disabled={!form.title || !form.author || !form.genre || !image}
           >
             Submit
           </button>

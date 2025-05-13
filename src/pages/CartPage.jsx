@@ -205,10 +205,12 @@ export function CartPage() {
                               {item.author}
                             </p>
                             <p className="mt-2 text-lg font-semibold text-gray-900">
-                              Rs. {item.originalPrice.toLocaleString()}
+                              Original Price: Rs.{" "}
+                              {item.originalPrice.toLocaleString()}
                             </p>
                             <p className="mt-2 text-lg font-semibold text-gray-900">
-                              Rs. {item.finalPrice.toLocaleString()}
+                              Final Price: Rs.{" "}
+                              {item.finalPrice.toLocaleString()}
                             </p>
                           </div>
                           <button

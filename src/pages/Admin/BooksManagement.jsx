@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Search, Plus, Filter, Edit, Trash2, SearchCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../context/AuthContext";
 import { createApiClient } from "../../lib/createApiClient";
 import toast from "react-hot-toast";
 import Sidebar from "./Sidebar";
@@ -10,7 +9,6 @@ export function BooksPage() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
-  const [showFilters, setShowFilters] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [books, setBooks] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -18,15 +16,7 @@ export function BooksPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  const { currentUser } = useContext(AuthContext);
   const token = localStorage.getItem("token");
-
-  const filters = [
-    { id: "all", name: "All Books" },
-    { id: "new", name: "New Releases" },
-    { id: "bestsellers", name: "Bestsellers" },
-    { id: "sale", name: "On Sale" },
-  ];
 
   const filteredBooks = books.filter((book) => {
     const matchesSearch = book.title
@@ -135,34 +125,7 @@ export function BooksPage() {
                 size={18}
               />
             </div>
-
-            <button
-              className="px-4 py-2 border rounded-lg flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors"
-              onClick={() => setShowFilters(!showFilters)}
-            >
-              <Filter size={18} />
-              <span className="font-medium text-sm">Filters</span>
-            </button>
           </div>
-
-          {/* Filter Chips */}
-          {showFilters && (
-            <div className="flex flex-wrap gap-2">
-              {filters.map((filter) => (
-                <button
-                  key={filter.id}
-                  className={`px-4 py-1.5 text-sm rounded-full font-medium ${
-                    activeFilter === filter.id
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-                  }`}
-                  onClick={() => setActiveFilter(filter.id)}
-                >
-                  {filter.name}
-                </button>
-              ))}
-            </div>
-          )}
 
           <div className="bg-white rounded-lg shadow overflow-x-auto">
             <table className="min-w-full text-sm">
@@ -197,7 +160,7 @@ export function BooksPage() {
                       </div>
                     </td>
                     <td className="px-4 py-3 text-gray-700">{book.genre}</td>
-                    <td className="px-4 py-3 font-medium">₹{book.price}</td>
+                    <td className="px-4 py-3 font-medium">Rs. {book.price}</td>
                     <td className="px-4 py-3">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${

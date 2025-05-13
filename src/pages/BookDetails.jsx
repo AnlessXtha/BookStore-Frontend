@@ -13,6 +13,7 @@ const BookDetails = () => {
   const navigate = useNavigate();
 
   const { currentUser } = useContext(AuthContext);
+
   const token = localStorage.getItem("token");
 
   const apiClient = createApiClient("https://localhost:7086");
@@ -117,15 +118,11 @@ const BookDetails = () => {
         date: new Date().toISOString(),
       };
 
-      console.log("Submitting review data:", reviewData); // Debug review submission
-
       const response = await apiClient.post("/api/Review/add", reviewData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      console.log("Review submission response:", response); // Debug submission response
 
       toast.success("Review submitted successfully!");
       setReviewForm({ rating: 5, comment: "" });
@@ -144,6 +141,9 @@ const BookDetails = () => {
       navigate("/login");
       return;
     } else {
+      if (isWhitelisted) {
+        return;
+      }
       try {
         const endpoint = `api/Whitelist/add/${bookData.bookId}`;
 
@@ -153,14 +153,13 @@ const BookDetails = () => {
           },
         });
 
-        // Optionally, you can update cart state here if needed
         toast.success("Added to Whitelist:", bookData.title);
       } catch (error) {
+        toast.error(error.response?.data);
+        setIsWhitelisted(true);
         console.error("Failed to add item to whitelist:", error);
       }
     }
-    // setIsWhitelisted(!isWhitelisted);
-    // toast.success("Book added to Whitelist");
   };
 
   const handleAddToCart = async () => {
@@ -228,25 +227,29 @@ const BookDetails = () => {
             <h1 className="text-5xl font-bold mb-2">{bookData.title}</h1>
             <p className="text-2xl mb-4">by {bookData.author}</p>
 
-            <p className="text-md mb-4">{bookData.description}</p>
-
-            {!bookData.activeDiscount ? (
-              <p className="text-xl font-semibold mb-2">Rs. {bookData.price}</p>
-            ) : (
-              <div className="mb-3">
-                <p className="text-xl text-gray-500 line-through">
+            {!bookData.isStoreOnlyAccess ? (
+              !bookData.activeDiscount ? (
+                <p className="text-xl font-semibold mb-2">
                   Rs. {bookData.price}
                 </p>
+              ) : (
+                <div className="mb-3">
+                  <p className="text-xl text-gray-500 line-through">
+                    Rs. {bookData.price}
+                  </p>
 
-                <div className="flex items-center gap-2">
-                  <span className="text-xl text-red-600 font-semibold">
-                    Rs. {bookData.activeDiscount.discountedPrice}
-                  </span>
-                  <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded">
-                    -{bookData.activeDiscount.discountPercent}%
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl text-red-600 font-semibold">
+                      Rs. {bookData.activeDiscount.discountedPrice}
+                    </span>
+                    <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded">
+                      -{bookData.activeDiscount.discountPercent}%
+                    </span>
+                  </div>
                 </div>
-              </div>
+              )
+            ) : (
+              <p className="text-xl font-semibold mb-2">---</p>
             )}
 
             <div className="flex items-center mb-4">
@@ -279,11 +282,10 @@ const BookDetails = () => {
                 <p>
                   <span className="font-semibold">ISBN:</span> {bookData.isbn}
                 </p>
-                {/* <p>
-                  <span className="font-semibold">Stock:</span>{" "}
-                  {bookData.stockQuantity}{" "}
-                  {bookData.stockQuantity > 1 ? "copies" : "copy"} available
-                </p> */}
+                <p>
+                  <span className="font-semibold">Publication Date: </span>
+                  {bookData.publicationDate.split("T")[0]}
+                </p>
               </div>
             </div>
 
@@ -305,23 +307,25 @@ const BookDetails = () => {
               >
                 {isWhitelisted ? "Added to Whitelist" : "Add to Whitelist"}
               </button>
-              <button
-                onClick={handleAddToCart}
-                className={`px-6 py-2 bg-black text-white font-medium ${
-                  isAddedToCart || !bookData.isAvailable ? "opacity-75" : ""
-                }`}
-                disabled={
-                  bookData.stockQuantity === 0 ||
-                  bookData.isStoreOnlyAccess ||
-                  isAddedToCart
-                }
-              >
-                {!bookData.isAvailable
-                  ? "Out of Stock"
-                  : isAddedToCart
-                  ? "Added to Cart"
-                  : "Add to Cart"}
-              </button>
+              {!bookData.isStoreOnlyAccess && (
+                <button
+                  onClick={handleAddToCart}
+                  className={`px-6 py-2 bg-black text-white font-medium ${
+                    isAddedToCart || !bookData.isAvailable ? "opacity-75" : ""
+                  }`}
+                  disabled={
+                    bookData.stockQuantity === 0 ||
+                    bookData.isStoreOnlyAccess ||
+                    isAddedToCart
+                  }
+                >
+                  {!bookData.isAvailable
+                    ? "Out of Stock"
+                    : isAddedToCart
+                    ? "Added to Cart"
+                    : "Add to Cart"}
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -331,67 +335,75 @@ const BookDetails = () => {
           <h2 className="text-2xl font-bold mb-6">Reviews</h2>
 
           {/* Review Form */}
-          {currentUser && hasPurchased && (
-            <form
-              onSubmit={handleReviewSubmit}
-              className="mb-8 p-6 bg-gray-50 rounded-lg"
-            >
-              <h3 className="text-lg font-semibold mb-4">Write a Review</h3>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Rating
-                </label>
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() =>
-                        setReviewForm((prev) => ({ ...prev, rating: star }))
-                      }
-                      className={`text-2xl ${
-                        star <= reviewForm.rating
-                          ? "text-yellow-500"
-                          : "text-gray-300"
-                      }`}
-                    >
-                      ★
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Comment
-                </label>
-                <textarea
-                  value={reviewForm.comment}
-                  onChange={(e) =>
-                    setReviewForm((prev) => ({
-                      ...prev,
-                      comment: e.target.value,
-                    }))
-                  }
-                  className="w-full p-2 border rounded-md"
-                  rows="4"
-                  required
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={isSubmittingReview}
-                className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 disabled:opacity-50"
+          {}
+          {currentUser &&
+            hasPurchased &&
+            (!reviews.some(
+              (review) => review.userName === currentUser.userName
+            ) ? (
+              <form
+                onSubmit={handleReviewSubmit}
+                className="mb-8 p-6 bg-gray-50 rounded-lg"
               >
-                {isSubmittingReview ? "Submitting..." : "Submit Review"}
-              </button>
-            </form>
-          )}
+                <h3 className="text-lg font-semibold mb-4">Write a Review</h3>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Rating
+                  </label>
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() =>
+                          setReviewForm((prev) => ({ ...prev, rating: star }))
+                        }
+                        className={`text-2xl ${
+                          star <= reviewForm.rating
+                            ? "text-yellow-500"
+                            : "text-gray-300"
+                        }`}
+                      >
+                        ★
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Comment
+                  </label>
+                  <textarea
+                    value={reviewForm.comment}
+                    onChange={(e) =>
+                      setReviewForm((prev) => ({
+                        ...prev,
+                        comment: e.target.value,
+                      }))
+                    }
+                    className="w-full p-2 border rounded-md"
+                    rows="4"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isSubmittingReview}
+                  className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 disabled:opacity-50"
+                >
+                  {isSubmittingReview ? "Submitting..." : "Submit Review"}
+                </button>
+              </form>
+            ) : (
+              <p className="text-gray-500 mb-4">
+                You have already submitted a review for this book.
+              </p>
+            ))}
 
           {/* Reviews List */}
           <div className="space-y-6">
             {reviews.length > 0 ? (
               reviews.map((review) => {
-                console.log("Individual Review:", review); // Debug individual review
                 return (
                   <div key={review.reviewId} className="border-b pb-6">
                     <div className="flex items-center mb-2">
@@ -415,7 +427,7 @@ const BookDetails = () => {
                     </div>
                     <p className="text-gray-700">{review.comment}</p>
                     <p className="text-sm text-gray-500 mt-2">
-                      By {currentUser?.userName || "Anonymous"}
+                      By {review?.userName || "Anonymous"}
                     </p>
                   </div>
                 );

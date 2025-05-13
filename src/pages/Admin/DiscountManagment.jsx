@@ -20,7 +20,7 @@ const bookService = {
         },
       });
       console.log("Books response:", response.data);
-      return response.data || [];
+      return response.data.data || [];
     } catch (error) {
       console.error("Error in getAllBooks:", error);
       throw error;

@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import Sidebar from "./Sidebar";
-import { genreOptions } from "../../constants/genreOptions";
+import {
+  formatOptions,
+  genreOptions,
+  languageOptions,
+} from "../../constants/genreOptions";
 import { createApiClient } from "../../lib/createApiClient";
 
 const EditBookForm = () => {
@@ -38,7 +42,7 @@ const EditBookForm = () => {
     const fetchBook = async () => {
       try {
         const res = await apiClient.get(`/api/Books/${id}`);
-        const book = res.data;
+        const book = res.data.data;
         setForm({
           title: book.title,
           description: book.description,
@@ -82,6 +86,8 @@ const EditBookForm = () => {
     setPreview(URL.createObjectURL(file));
   };
 
+  const token = localStorage.getItem("token");
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -98,7 +104,10 @@ const EditBookForm = () => {
 
     try {
       await apiClient.put(`/api/Books/${id}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
       });
       toast.success("Book updated successfully!");
       navigate("/admin");
@@ -208,18 +217,25 @@ const EditBookForm = () => {
                   <label className="block mb-1 font-semibold text-gray-700">
                     Language
                   </label>
-                  <input
+                  <select
                     name="language"
-                    type="text"
                     value={form.language}
                     onChange={handleChange}
                     required
                     className="w-full p-2 border border-gray-300 rounded"
-                  />
+                  >
+                    <option value=""></option>
+                    {languageOptions
+                      .filter((option) => option.value !== "")
+                      .map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                  </select>
                 </div>
               </div>
 
-              {/* Row 3: Publisher & Format */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block mb-1 font-semibold text-gray-700">
@@ -239,18 +255,25 @@ const EditBookForm = () => {
                   <label className="block mb-1 font-semibold text-gray-700">
                     Format
                   </label>
-                  <input
+                  <select
                     name="format"
-                    type="text"
                     value={form.format}
                     onChange={handleChange}
                     required
                     className="w-full p-2 border border-gray-300 rounded"
-                  />
+                  >
+                    <option value=""></option>
+                    {formatOptions
+                      .filter((option) => option.value !== "")
+                      .map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                  </select>
                 </div>
               </div>
 
-              {/* Row 4: ISBN (alone) */}
               <div>
                 <label className="block mb-1 font-semibold text-gray-700">
                   ISBN
