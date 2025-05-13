@@ -14,8 +14,8 @@ import OrdersPage from "./pages/MyOrders";
 import OrderDetails from "./pages/OrderDetails";
 import BookDetails from "./pages/BookDetails";
 import BookCatalog from "./pages/BookCatalog";
-import AddBookForm from "./pages/AddBookForm";
-import EditBookForm from "./pages/EditBookForm";
+import AddBookForm from "./pages/Admin/AddBookForm";
+import EditBookForm from "./pages/Admin/EditBookForm";
 
 import { MainLayout, RequireAuth } from "./components/MainLayout";
 import { BooksPage } from "./pages/Admin/BooksManagement";
