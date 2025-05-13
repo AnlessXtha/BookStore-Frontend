@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import { Bookmark, ShoppingCart, User } from "lucide-react";
+import { Bell, Bookmark, ShoppingCart, User } from "lucide-react";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -55,6 +55,12 @@ function Navbar() {
               className="text-gray-600 hover:text-blue-600 active:text-blue-700"
             >
               <Bookmark />
+            </Link>
+             <Link
+              to="/active-banner-announcements"
+              className="text-gray-600 hover:text-blue-600 active:text-blue-700"
+            >
+              <Bell />
             </Link>
 
             {currentUser ? (

@@ -8,7 +8,9 @@ import {
     ChevronLeft,
     ChevronRight,
     LogOut,
-    BookIcon
+    BookIcon,
+    Speaker,
+    Megaphone
 } from 'lucide-react';
 
 export function Sidebar() {
@@ -18,6 +20,7 @@ export function Sidebar() {
     const menuItems = [
         { name: 'Users', icon: <UserCog size={20} />, path: '/admin/users' },
         { name: 'Books', icon: <BookOpen size={20} />, path: '/admin' },
+        { name: 'Announcements', icon: <Megaphone size={20} />, path: '/admin/announcements' },
     ];
 
     const handleLogout = () => {

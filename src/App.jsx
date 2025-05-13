@@ -22,6 +22,8 @@ import EditBookForm from "./pages/Admin/EditBookForm";
 import UserProfile from "./pages/UserProfile";
 import OrderNotifications from "./pages/OrderNotifications";
 import RedirectBasedOnRole from "./pages/RedirectBasedOnRole";
+import BannerManagement from "./pages/Admin/BannerManagaement";
+import ActiveBannerAnnouncements from "./pages/ActiveBannerAnnouncements";
 // import CataloguePage from "./pages/CataloguePage"; // Create this page too
 
 const router = createBrowserRouter([
@@ -49,6 +51,7 @@ const router = createBrowserRouter([
           { path: "whitelist", element: <Whitelist /> },
           { path: "myorders", element: <OrdersPage /> },
           { path: "orderdetails/:id", element: <OrderDetails /> },
+          { path: "active-banner-announcements", element: <ActiveBannerAnnouncements /> },
           { path: "user-profile", element: <UserProfile /> },
         ],
       },
@@ -61,6 +64,7 @@ const router = createBrowserRouter([
     children: [
       { path: "", element: <BooksPage /> },
       { path: "users", element: <UsersPage /> },
+      { path: "announcements", element: <BannerManagement /> },
       { path: "add-book", element: <AddBookForm /> },
       { path: "edit-book/:id", element: <EditBookForm /> },
     ],

@@ -105,7 +105,10 @@ export function BooksPage() {
 
       {/* Header with title and button */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8 mt-6 mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-800"><BookOpen /> Book Inventory</h1>
+<h1 className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-gray-800">
+  <BookOpen className="w-6 h-6" />
+  Book Inventory
+</h1>
         <button
           className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors"
           onClick={() => navigate('/admin/add-book')}
